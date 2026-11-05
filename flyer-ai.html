@@ -177,6 +177,10 @@ details.edit summary::-webkit-details-marker{display:none}
       months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
     }
   };
+  /* 5 Nov 2026: back from MonCash with the phone's Back button = this purchase screen, and the paid order looked lost */
+  T.ht.priorPaid = '✅ Ou deja peye yon flyer pou evènman sa a.'; T.ht.priorWait = '⏳ Ou gen yon peman flyer pou evènman sa a k ap verifye. PA peye ankò.'; T.ht.priorOpen = 'Wè flyer mwen an';
+  T.fr.priorPaid = '✅ Vous avez déjà payé un flyer pour cet événement.'; T.fr.priorWait = '⏳ Un paiement de flyer pour cet événement est en cours de vérification. NE payez PAS à nouveau.'; T.fr.priorOpen = 'Voir mon flyer';
+  T.en.priorPaid = '✅ You already paid for a flyer for this event.'; T.en.priorWait = '⏳ A flyer payment for this event is being checked. Do NOT pay again.'; T.en.priorOpen = 'See my flyer';
   function t(k, v) {
     var s = (T[lang] && T[lang][k] != null) ? T[lang][k] : T.ht[k];
     if (typeof s === 'string' && v) Object.keys(v).forEach(function (x) { s = s.split('{' + x + '}').join(v[x]); });
@@ -688,6 +692,22 @@ details.edit summary::-webkit-details-marker{display:none}
     }).catch(function () { clearTimeout(pollTimer); pollTimer = setTimeout(poll, 5000); });
   }
 
+  /* the orders THIS phone already placed for this event (tl_flyers): the server re-checks each payment */
+  function priorOrders(ev) {
+    var mine = (ls('tl_flyers') || []).filter(function (x) { return x && x.eventId === ev._id && Date.now() - (x.at || 0) < 7 * 864e5; }).slice(0, 3);
+    mine.forEach(function (x) {
+      getJSON('/api/flyers/' + encodeURIComponent(x.ref)).then(function (o) {
+        if (!o || o._s !== 200 || !o.status || REF) return;
+        var paid = o.status !== 'pending';
+        if (!paid && Date.now() - (x.at || 0) > 2 * 3600e3) return;   /* an old unpaid try: nothing to say */
+        var c = document.createElement('div');
+        c.className = 'card'; c.style.border = '2px solid ' + (paid ? '#12A150' : '#F59E0B');
+        c.innerHTML = '<b>' + esc(t(paid ? 'priorPaid' : 'priorWait')) + '</b><a class="btn btn-main" style="margin-top:10px" href="flyer-ai.html?ref=' + encodeURIComponent(x.ref) + '">' + esc(t('priorOpen')) + '</a>';
+        app.insertBefore(c, app.firstChild);
+      }).catch(function () {});
+    });
+  }
+
   function route() {
     drawLangs();
     if (REF) {
@@ -702,6 +722,7 @@ details.edit summary::-webkit-details-marker{display:none}
       EV = ev;
       if (CFG.ai === false) { app.innerHTML = '<div class="card"><h3>' + esc(t('noAi')) + '</h3></div>'; return; }
       screenOrder();
+      priorOrders(ev);
     }).catch(function () { app.innerHTML = '<div class="card"><h3>' + esc(t('err')) + '</h3></div>'; });
   }
   route();

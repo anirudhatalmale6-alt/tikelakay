@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Partner section — preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#00209F;--red:#D21034;--gold:#D4A017;--gold-soft:#FDF3D7;--green:#1B8C3D;--dark:#0A0E1A;--text:#1A2A4A;--text-light:#5A6B8A;--text-muted:#8A95AA;--border:#E2E8F0;--off:#F5F7FA;
+  --body:'Plus Jakarta Sans',system-ui,sans-serif;--display:'DM Serif Display',Georgia,serif}
+*{box-sizing:border-box}body{margin:0;background:var(--off);color:var(--text);font-family:var(--body)}
+.top{background:var(--dark);color:#fff;padding:14px 16px}
+.top b{font-size:1rem}.top p{margin:4px 0 0;font-size:.85rem;opacity:.85;line-height:1.4}
+.langs{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.langs button{border:1px solid rgba(255,255,255,.35);background:transparent;color:#fff;border-radius:99px;padding:6px 11px;font:700 .8rem var(--body);cursor:pointer}
+.langs button.on{background:#fff;color:var(--dark)}
+.wrap{max-width:440px;margin:0 auto;padding:12px 14px 30px}
+.tag{display:inline-block;background:#EEF2FF;color:var(--blue);font-weight:800;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:5px 10px;margin:16px 0 6px}
+.card{background:#fff;border:1px solid var(--border);border-radius:20px;padding:18px;margin-top:10px;box-shadow:0 1px 3px rgba(10,14,26,.06)}
+.card-title{font-family:var(--display);font-size:1.15rem;color:var(--dark);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.ev h1{font-family:var(--display);font-size:1.35rem;margin:0 0 6px;color:var(--dark)}
+.ev .meta{font-size:.88rem;color:var(--text-light);line-height:1.6}
+.price{display:inline-block;margin-top:8px;background:var(--gold-soft);color:#7A5A00;font-weight:800;border-radius:10px;padding:6px 10px;font-size:.9rem}
+.pt{display:flex;align-items:center;gap:12px;border:1.5px solid var(--border);border-radius:14px;padding:12px;margin-top:10px;text-decoration:none;color:inherit;background:#fff}
+.pt .ic{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;font-size:1.35rem;background:#F1F5FF}
+.pt .tx{flex:1;min-width:0}.pt .tx b{display:block;font-size:.95rem;color:var(--dark)}.pt .tx small{color:var(--text-light);font-size:.8rem}
+.pt .go{flex:none;background:var(--blue);color:#fff;font-weight:800;font-size:.82rem;border-radius:10px;padding:9px 12px}
+.pt.off{opacity:.45;border-style:dashed}.pt.off .go{background:#94A3B8}
+.disc{font-size:.74rem;color:var(--text-muted);margin-top:10px;line-height:1.4}
+.ok{background:#E8F5E9;color:var(--green);border-radius:14px;padding:12px 14px;font-weight:800}
+.note{background:#FFF7E6;border:1px solid #F5C26B;border-radius:14px;padding:12px 14px;font-size:.86rem;line-height:1.5;margin-top:14px}
+.note b{color:#7C4A03}
+</style>
+</head>
+<body>
+<div class="top">
+  <b>PREVIEW · Partner section (not live)</b>
+  <p>How the reusable partner section would look on an international event page and on the ticket confirmation. Only the Expedia card is real (your link). Grey cards = partners added later the same way.</p>
+  <div class="langs" id="langs"></div>
+</div>
+<div class="wrap">
+
+  <span class="tag" id="t_ctx1"></span>
+  <div class="card ev">
+    <h1>Konpa Night Miami</h1>
+    <div class="meta">📅 Sat, Dec 12 2026 · 9:00 PM<br>📍 Little Haiti Cultural Complex, Miami, FL · 🇺🇸</div>
+    <span class="price">$25.00 USD</span>
+  </div>
+  <div class="card" id="sec1"></div>
+
+  <span class="tag" id="t_ctx2"></span>
+  <div class="card"><div class="ok" id="t_conf"></div></div>
+  <div class="card" id="sec2"></div>
+
+  <div class="note" id="t_note"></div>
+</div>
+<script>
+var EXPEDIA = 'https://expedia.com/affiliate/MEp8EvO';
+var L = {
+  ht:{n:'Kreyòl',title:'🌍 Planifye vwayaj ou',ctx1:'Paj evènman entènasyonal',ctx2:'Konfimasyon tikè',conf:'✅ Tikè ou konfime! Ou soti lwen? Men kèk bagay ki ka ede w.',
+      hotel:'Rezève yon otèl toupre evènman an',ride:'Pran yon Uber pou ale nan evènman an',lyft:'Pran yon Lyft pou ale nan evènman an',dining:'Rezève yon tab nan yon restoran',tours:'Aktivite ak vizit nan zòn nan',open:'Louvri',later:'pita',
+      disc:'Tikè Lakay ka touche yon komisyon sou lyen patnè yo. Sa pa koute w anyen anplis.',
+      note:'<b>Kijan sa mache:</b> yon sèl lis patnè (non, kategori, lyen, peyi, aktif/pa aktif). Pou ajoute Uber, Lyft, OpenTable oswa Viator, se yon liy ki ajoute, pa yon nouvo sistèm. Seksyon an parèt sèlman sou evènman ki pa an Ayiti.'},
+  fr:{n:'Français',title:'🌍 Planifiez votre voyage',ctx1:'Page d’un événement international',ctx2:'Confirmation du billet',conf:'✅ Votre billet est confirmé ! Vous venez de loin ? Voici de quoi vous aider.',
+      hotel:'Réserver un hôtel près de l’événement',ride:'Prendre un Uber pour l’événement',lyft:'Prendre un Lyft pour l’événement',dining:'Réserver une table au restaurant',tours:'Activités et visites dans la région',open:'Ouvrir',later:'bientôt',
+      disc:'Tikè Lakay peut toucher une commission sur les liens partenaires, sans frais supplémentaires pour vous.',
+      note:'<b>Fonctionnement :</b> une seule liste de partenaires (nom, catégorie, lien, pays, actif/inactif). Ajouter Uber, Lyft, OpenTable ou Viator = ajouter une ligne, pas un nouveau système. La section n’apparaît que pour les événements hors d’Haïti.'},
+  en:{n:'English',title:'🌍 Plan your trip',ctx1:'International event page',ctx2:'Ticket confirmation',conf:'✅ Your ticket is confirmed! Coming from out of town? Here is some help.',
+      hotel:'Book a hotel near the event',ride:'Get an Uber to the event',lyft:'Get a Lyft to the event',dining:'Reserve a table at a restaurant',tours:'Tours & activities nearby',open:'Open',later:'later',
+      disc:'Tikè Lakay may earn a commission from partner links, at no extra cost to you.',
+      note:'<b>How it works:</b> one partner list (name, category, link, countries, on/off). Adding Uber, Lyft, OpenTable or Viator = adding one line, not a new system. The section only appears on events outside Haiti.'},
+  es:{n:'Español',title:'🌍 Planifica tu viaje',ctx1:'Página de evento internacional',ctx2:'Confirmación del boleto',conf:'✅ ¡Tu boleto está confirmado! ¿Vienes de lejos? Aquí tienes ayuda.',
+      hotel:'Reserva un hotel cerca del evento',ride:'Pide un Uber al evento',lyft:'Pide un Lyft al evento',dining:'Reserva una mesa en un restaurante',tours:'Tours y actividades cercanas',open:'Abrir',later:'pronto',
+      disc:'Tikè Lakay puede recibir una comisión por los enlaces de socios, sin costo adicional para ti.',
+      note:'<b>Cómo funciona:</b> una sola lista de socios (nombre, categoría, enlace, países, activo/inactivo). Añadir Uber, Lyft, OpenTable o Viator = añadir una línea, no un sistema nuevo. La sección solo aparece en eventos fuera de Haití.'},
+  pt:{n:'Português',title:'🌍 Planeje sua viagem',ctx1:'Página de evento internacional',ctx2:'Confirmação do ingresso',conf:'✅ Seu ingresso está confirmado! Vem de longe? Aqui vai uma ajuda.',
+      hotel:'Reserve um hotel perto do evento',ride:'Peça um Uber para o evento',lyft:'Peça um Lyft para o evento',dining:'Reserve uma mesa num restaurante',tours:'Passeios e atividades na região',open:'Abrir',later:'em breve',
+      disc:'O Tikè Lakay pode receber uma comissão pelos links de parceiros, sem custo extra para você.',
+      note:'<b>Como funciona:</b> uma única lista de parceiros (nome, categoria, link, países, ativo/inativo). Adicionar Uber, Lyft, OpenTable ou Viator = adicionar uma linha, não um sistema novo. A seção só aparece em eventos fora do Haiti.'}
+};
+/* THE PARTNER LIST (one line per partner). Only "on" partners are shown on the real pages. */
+var PARTNERS = [
+  {id:'expedia', name:'Expedia', icon:'🏨', label:'hotel', on:true, url:EXPEDIA},
+  {id:'uber', name:'Uber', icon:'🚗', label:'ride', on:false},
+  {id:'lyft', name:'Lyft', icon:'🚕', label:'lyft', on:false},
+  {id:'opentable', name:'OpenTable', icon:'🍽️', label:'dining', on:false},
+  {id:'viator', name:'Viator', icon:'🎟️', label:'tours', on:false}
+];
+var lang = 'en';
+function section(t){
+  return '<div class="card-title">' + t.title + '</div>' + PARTNERS.map(function(p){
+    var inner = '<span class="ic">' + p.icon + '</span><span class="tx"><b>' + t[p.label] + '</b><small>' + p.name + (p.on ? '' : ' · ' + t.later) + '</small></span><span class="go">' + (p.on ? t.open + ' ↗' : '—') + '</span>';
+    return p.on ? '<a class="pt" href="' + p.url + '" target="_blank" rel="noopener sponsored">' + inner + '</a>' : '<div class="pt off">' + inner + '</div>';
+  }).join('') + '<div class="disc">' + t.disc + '</div>';
+}
+function paint(){
+  var t = L[lang];
+  document.getElementById('langs').innerHTML = Object.keys(L).map(function(k){ return '<button class="' + (k === lang ? 'on' : '') + '" data-l="' + k + '">' + L[k].n + '</button>'; }).join('');
+  document.querySelectorAll('#langs button').forEach(function(b){ b.onclick = function(){ lang = b.getAttribute('data-l'); paint(); }; });
+  document.getElementById('t_ctx1').textContent = t.ctx1; document.getElementById('t_ctx2').textContent = t.ctx2;
+  document.getElementById('t_conf').textContent = t.conf; document.getElementById('t_note').innerHTML = t.note;
+  document.getElementById('sec1').innerHTML = section(t); document.getElementById('sec2').innerHTML = section(t);
+}
+paint();
+</script>
+</body>
+</html>

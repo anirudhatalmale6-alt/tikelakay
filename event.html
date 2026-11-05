@@ -169,6 +169,8 @@ img{max-width:100%;display:block}
 
 /* SHARE BUTTONS */
 .share-row{display:flex;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border-light)}
+/* 5 Nov 2026: 4 buttons in one row were wider than a phone (the page slid sideways) - 2 x 2 on phones */
+@media (max-width:480px){.share-row{flex-wrap:wrap}.share-row .share-btn{flex:1 1 calc(50% - 4px);min-width:0;padding:0 8px}}
 .share-btn{
   height:38px;padding:0 14px;border-radius:10px;font-size:.75rem;font-weight:700;
   display:flex;align-items:center;gap:6px;transition:all .2s;flex:1;justify-content:center;

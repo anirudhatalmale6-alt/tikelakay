@@ -164,6 +164,11 @@ footer small{font-size:.75rem;color:#6F7C99}
 /* preview-only sample */
 .sample{border:2px dashed #E8C766;border-radius:22px;padding:16px;background:#FFFBEF;margin-top:10px}
 .sample .lbl{font-size:.75rem;font-weight:800;color:#7A4B00;margin-bottom:10px}
+.past-ev{margin:18px 0 4px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;padding:4px 12px}
+.past-ev summary{cursor:pointer;font-weight:800;padding:12px 2px;color:#0B1340;list-style:revert}
+.past-ev a{display:flex;align-items:center;gap:10px;padding:10px 2px;border-top:1px solid #F1F5F9;color:#0F172A;text-decoration:none}
+.past-ev .pd{flex:none;font-size:.78rem;color:#64748B;font-weight:700;width:84px}.past-ev .pt{flex:1;font-weight:700;font-size:.9rem}
+.past-ev .pt small{display:block;font-weight:500;color:#64748B;font-size:.78rem}
 </style><link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
@@ -358,6 +363,7 @@ var TR = {
  '🎓 Kijan sa mache? Gade videyo yo ›':{fr:'🎓 Comment ça marche ? Voir les vidéos ›',en:'🎓 How does it work? Watch the videos ›',es:'🎓 ¿Cómo funciona? Mira los videos ›',pt:'🎓 Como funciona? Veja os vídeos ›'},
  '🎓 Gade videyo tutoryèl yo':{fr:'🎓 Voir les tutoriels vidéo',en:'🎓 Watch the video tutorials',es:'🎓 Ver los tutoriales en video',pt:'🎓 Ver os tutoriais em vídeo'},
  '🎓 Tutoryèl':{fr:'🎓 Tutoriels',en:'🎓 Tutorials',es:'🎓 Tutoriales',pt:'🎓 Tutoriais'},
+ '📅 Evènman ki fin pase':{fr:'📅 Événements passés',en:'📅 Past events',es:'📅 Eventos pasados',pt:'📅 Eventos passados'},
  '💬 Bezwen Èd?':{fr:'💬 Besoin d’aide ?',en:'💬 Need help?',es:'💬 ¿Necesitas ayuda?',pt:'💬 Precisa de ajuda?'},
  'Pa gen frè pou kreye evènman ou.':{fr:'Créer votre événement est gratuit.',en:'Creating your event is free.',es:'Crear tu evento es gratis.',pt:'Criar o seu evento é grátis.'},
  'Evènman gratis: pa gen okenn frè. Evènman peye: moun k ap achte a peye yon frè sèvis 7.5% anplis pri tikè a, epi ou resevwa tout pri tikè ou mete a.':{fr:'Événement gratuit : aucun frais. Événement payant : l’acheteur paie des frais de service de 7,5 % en plus du prix, et vous recevez le prix complet du billet.',en:'Free event: no fee at all. Paid event: the buyer pays a 7.5% service fee on top of the price, and you receive the full ticket price.',es:'Evento gratis: sin ninguna tarifa. Evento de pago: quien compra paga una tarifa de servicio del 7,5 % además del precio, y usted recibe el precio completo del boleto.',pt:'Evento grátis: nenhuma taxa. Evento pago: o comprador paga uma taxa de serviço de 7,5% além do preço, e você recebe o preço total do ingresso.'},
@@ -665,7 +671,7 @@ function loadFlyers(root){
     }).catch(function(){});
   });
 }
-var upcoming=[], all=[], activeTypes=null, activeName='';
+var upcoming=[], past=[], all=[], activeTypes=null, activeName='';
 function render(){
   var area=document.getElementById('evArea');
   var q=(document.getElementById('q').value||'').trim().toLowerCase();
@@ -680,8 +686,21 @@ function render(){
     area.innerHTML='<div class="empty"><b>'+tr('🎉 BYENTO SOU TIKÈ LAKAY!')+'</b><p style="margin-bottom:0">'+tr('Nouvo konsè, fòmasyon ak lòt evènman ap vini. Ou gen yon evènman?')+' <a class="lnk" href="'+CREATE+'">'+tr('Pibliye l gratis!')+'</a></p></div>';
     return;
   }
-  area.innerHTML='<div class="grid">'+(list.length?list.map(card).join(''):'')+'</div>'+(list.length?'':'<p class="results-note">'+tr('Pa gen evènman k ap vini pou rechèch sa a.')+'</p>');
+  area.innerHTML='<div class="grid">'+(list.length?list.map(card).join(''):'')+'</div>'+(list.length?'':'<p class="results-note">'+tr('Pa gen evènman k ap vini pou rechèch sa a.')+'</p>')+pastHtml(q);
   loadFlyers(area);
+}
+function pastHtml(q){
+  var l=past.filter(function(e){
+    if(activeTypes&&activeTypes.indexOf(e.type)<0)return false;
+    if(q&&((e.title||'')+' '+(e.location||'')+' '+(e.organizer||'')).toLowerCase().indexOf(q)<0)return false;
+    return true;
+  });
+  if(!l.length)return '';
+  return '<details class="past-ev"'+(q?' open':'')+'><summary>'+tr('📅 Evènman ki fin pase')+' ('+l.length+')</summary>'+
+    l.map(function(e){
+      return '<a href="event.html?id='+encodeURIComponent(e._id)+'"><span class="pd">'+esc(e.date)+'</span><span class="pt">'+esc(e.title||'')+
+        '<small>'+esc(e.location||'')+'</small></span><span>›</span></a>';
+    }).join('')+'</details>';
 }
 function load(){
   var area=document.getElementById('evArea');
@@ -691,6 +710,11 @@ function load(){
     /* Upcoming = today or later, in Haiti's date. Nothing past is ever shown as upcoming. */
     upcoming=all.filter(function(e){return /^\d{4}-\d{2}-\d{2}$/.test(e.date||'')&&e.date>=today;})
       .sort(function(a,b){return (a.date+(a.startTime||'')).localeCompare(b.date+(b.startTime||''));});
+    /* 5 Nov 2026 (Jennifer: "previous training events are no longer visible"): the last 6 months stay
+       findable below, read-only. Older dates are left out (several are typos: 2003, 2023). */
+    var since=new Date(Date.now()-183*864e5).toISOString().slice(0,10);
+    past=all.filter(function(e){return /^\d{4}-\d{2}-\d{2}$/.test(e.date||'')&&e.date<today&&e.date>=since;})
+      .sort(function(a,b){return (b.date+(b.startTime||'')).localeCompare(a.date+(a.startTime||''));});
     render();
   }).catch(function(){
     area.innerHTML='<div class="empty"><b>'+tr('Nou pa ka chaje evènman yo kounye a.')+'</b><p>'+tr('Koneksyon an ka fèb. Eseye ankò.')+'</p><button class="cta r" id="retry" style="display:inline-flex">'+tr('Eseye ankò')+'</button></div>';

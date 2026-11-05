@@ -183,7 +183,7 @@ var I18N = {
         manualLabel:'Oswa antre referans lan alamen', btnCheck:'Verifye',
         footNote:'Paj sa a sèlman li tikè a. Li pa chanje anyen.',
         lEvent:'Evènman', lDate:'Dat', lPlace:'Kote', lName:'Non', lType:'Tip Tikè',
-        lQty:'Kantite', lRef:'Referans', lPaid:'Peye', lAmount:'Total',
+        lPass:'Moun', lQty:'Kantite', lRef:'Referans', lPaid:'Peye', lAmount:'Total',
         doorOff:'Mòd Pòt: Etenn', doorOn:'Mòd Pòt: Limen', btnDoorOn:'Limen', btnDoorOff:'Etenn',
         doorCodeLabel:'Antre kòd pòt evènman an', btnUnlock:'Louvri',
         badCode:'KÒD LA PA BON', badCodeSub:'Kòd sa a pa bon. Mande òganizatè a kòd pòt la.',
@@ -207,7 +207,7 @@ var I18N = {
         manualLabel:'Ou saisissez la référence manuellement', btnCheck:'Vérifier',
         footNote:'Cette page lit seulement le billet. Elle ne change rien.',
         lEvent:'Événement', lDate:'Date', lPlace:'Lieu', lName:'Nom', lType:'Type de billet',
-        lQty:'Quantité', lRef:'Référence', lPaid:'Payé le', lAmount:'Total',
+        lPass:'Personne', lQty:'Quantité', lRef:'Référence', lPaid:'Payé le', lAmount:'Total',
         doorOff:'Mode Entrée : éteint', doorOn:'Mode Entrée : activé', btnDoorOn:'Activer', btnDoorOff:'Éteindre',
         doorCodeLabel:'Saisissez le code d\'entrée de l\'événement', btnUnlock:'Ouvrir',
         badCode:'CODE INCORRECT', badCodeSub:'Ce code n\'est pas valable. Demandez le code d\'entrée à l\'organisateur.',
@@ -231,7 +231,7 @@ var I18N = {
         manualLabel:'Or type the reference by hand', btnCheck:'Check',
         footNote:'This page only reads the ticket. It changes nothing.',
         lEvent:'Event', lDate:'Date', lPlace:'Place', lName:'Name', lType:'Ticket type',
-        lQty:'Quantity', lRef:'Reference', lPaid:'Paid', lAmount:'Total',
+        lPass:'Person', lQty:'Quantity', lRef:'Reference', lPaid:'Paid', lAmount:'Total',
         doorOff:'Door mode: off', doorOn:'Door mode: on', btnDoorOn:'Turn on', btnDoorOff:'Turn off',
         doorCodeLabel:'Enter the event door code', btnUnlock:'Unlock',
         badCode:'WRONG CODE', badCodeSub:'That code is not valid. Ask the organiser for the door code.',
@@ -447,6 +447,8 @@ function show(data) {
   html += row(t('lName'), esc(data.buyerName));
   html += row(t('lType'), esc(data.ticketName));
   html += row(t('lQty'), esc(data.qty));
+  /* 4 Nov 2026: one QR per attendee - which person of the group this QR is */
+  if (data.pass) html += row(t('lPass'), '<b>' + esc(data.pass.n) + ' / ' + esc(data.pass.of) + '</b>');
   html += row(t('lAmount'), data.totalAmount ? 'HTG ' + esc(data.totalAmount) : '');
   html += row(t('lPaid'), esc(formatWhen(data.paidAt)));
   if (data.used) {

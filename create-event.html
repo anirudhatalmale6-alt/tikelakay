@@ -719,7 +719,7 @@ img{max-width:100%;display:block}
 
   <div class="fee-note">
     <span class="icon">💡</span>
-    <span data-i18n="platform_fee">Ou resevwa tout pri tikè ou mete a. Moun k ap achte a peye yon frè sèvis 7.5% anplis. Evènman gratis = san frè.</span>
+    <span data-i18n="platform_fee">Ou resevwa tout pri tikè ou mete a. Moun k ap achte a peye yon frè sèvis 7.5% anplis. Evènman gratis = san frè. Tout tikè peye yo se VANT FINAL pou achtè a (san ranbousman). Si evènman an anile, Tikè Lakay ranbouse achtè yo pa pwosesis eksepsyon an, pa otomatikman.</span>
   </div>
 
   <div class="summary-card" id="summaryCard">
@@ -947,7 +947,7 @@ var i18n = {
     creator_payout_desc: 'Bay pwomotè % sou chak tikè yo vann',
     creator_pct: 'Pousantaj Creator (%)',
     hosted_badge: '"Hosted by" Badge',
-    platform_fee: 'Ou resevwa tout pri tikè ou mete a. Moun k ap achte a peye yon frè sèvis 7.5% anplis. Evènman gratis = san frè.',
+    platform_fee: 'Ou resevwa tout pri tikè ou mete a. Moun k ap achte a peye yon frè sèvis 7.5% anplis. Evènman gratis = san frè. Tout tikè peye yo se VANT FINAL pou achtè a (san ranbousman). Si evènman an anile, Tikè Lakay ranbouse achtè yo pa pwosesis eksepsyon an, pa otomatikman.',
     event_summary: 'Rezime Evènman',
     sum_title: 'Tit',
     sum_date: 'Dat',
@@ -1046,7 +1046,7 @@ var i18n = {
     creator_payout_desc: 'Donner aux promoteurs un % sur chaque billet vendu',
     creator_pct: 'Pourcentage Créateur (%)',
     hosted_badge: 'Badge "Hébergé par"',
-    platform_fee: 'Vous recevez le prix complet de vos billets. L\'acheteur paie des frais de service de 7,5 % en plus. Événement gratuit = sans frais.',
+    platform_fee: 'Vous recevez le prix complet de vos billets. L\'acheteur paie des frais de service de 7,5 % en plus. Événement gratuit = sans frais. Tout billet payé est une VENTE FINALE pour l\'acheteur (sans remboursement). Si l\'événement est annulé, Tikè Lakay rembourse les acheteurs par sa procédure d\'exception, jamais automatiquement.',
     event_summary: "Résumé de l'Événement",
     sum_title: 'Titre',
     sum_date: 'Date',
@@ -1145,7 +1145,7 @@ var i18n = {
     creator_payout_desc: 'Give promoters a % on each ticket sold',
     creator_pct: 'Creator Percentage (%)',
     hosted_badge: '"Hosted by" Badge',
-    platform_fee: 'You receive the full ticket price. The buyer pays a 7.5% service fee on top. Free events = no fee.',
+    platform_fee: 'You receive the full ticket price. The buyer pays a 7.5% service fee on top. Free events = no fee. Every paid ticket is a FINAL SALE for the buyer (no refund). If the event is cancelled, Tikè Lakay refunds buyers through its exception process, never automatically.',
     event_summary: 'Event Summary',
     sum_title: 'Title',
     sum_date: 'Date',
@@ -1244,7 +1244,7 @@ var i18n = {
     creator_payout_desc: 'Dê aos divulgadores uma % em cada ingresso vendido',
     creator_pct: 'Porcentagem do divulgador (%)',
     hosted_badge: 'Selo "Apresentado por"',
-    platform_fee: 'Você recebe o preço total do ingresso. O comprador paga uma taxa de serviço de 7,5% a mais. Eventos gratuitos = sem taxa.',
+    platform_fee: 'Você recebe o preço total do ingresso. O comprador paga uma taxa de serviço de 7,5% a mais. Eventos gratuitos = sem taxa. Todo ingresso pago é VENDA FINAL para o comprador (sem reembolso). Se o evento for cancelado, a Tikè Lakay reembolsa os compradores pelo processo de exceção, nunca automaticamente.',
     event_summary: 'Resumo do evento',
     sum_title: 'Título',
     sum_date: 'Data',
@@ -1343,7 +1343,7 @@ var i18n = {
     creator_payout_desc: 'Dar a promotores un % en cada boleto vendido',
     creator_pct: 'Porcentaje del Creador (%)',
     hosted_badge: 'Insignia "Presentado por"',
-    platform_fee: 'Usted recibe el precio completo del boleto. El comprador paga una tarifa de servicio de 7,5% adicional. Evento gratuito = sin cargo.',
+    platform_fee: 'Usted recibe el precio completo del boleto. El comprador paga una tarifa de servicio de 7,5% adicional. Evento gratuito = sin cargo. Todo boleto pagado es VENTA FINAL para el comprador (sin reembolso). Si el evento se cancela, Tikè Lakay reembolsa a los compradores por su proceso de excepción, nunca automáticamente.',
     event_summary: 'Resumen del Evento',
     sum_title: 'Título',
     sum_date: 'Fecha',
@@ -1803,6 +1803,10 @@ function renderCanvas() {
     ctx.drawImage(logoImage, (w - lw) / 2, h * 0.08, lw, lh);
   }
 
+  /* 4 Nov 2026 (Jeffery: sponsor logos "on invitations"): his sponsors are his, like his logo - drawn as images
+     (never altered) on a light band near the bottom, whether or not our text is on. */
+  drawSponsorBand(ctx, w, h);
+
   /* Unticked means exactly that: his picture, and nothing of ours on top of it. */
   if (!withText) return;
 
@@ -2058,7 +2062,7 @@ function collectDraft() {
   d.moncash = mc && mc.querySelector('input') ? mc.querySelector('input').value : '';
   d.natcash = nc && nc.querySelector('input') ? nc.querySelector('input').value : '';
   var kt = document.getElementById('koutyeToggle');
-  d.koutye = kt ? kt.checked : false;
+  d.koutye = kt ? kt.classList.contains('on') : false;
   return d;
 }
 
@@ -2171,7 +2175,7 @@ function applyDraft(d) {
   if (mc && mc.querySelector('input')) mc.querySelector('input').value = d.moncash || '';
   if (nc && nc.querySelector('input')) nc.querySelector('input').value = d.natcash || '';
   var kt = document.getElementById('koutyeToggle');
-  if (kt) kt.checked = !!d.koutye;
+  if (kt) kt.classList.toggle('on', !!d.koutye);
   if (d.logo) setLogo(d.logo, d.logoName, true);
   if (d.flyer) setFlyer(d.flyer, d.flyerName, true);
 
@@ -2368,7 +2372,7 @@ function enterEditMode(ev) {
     });
   });
   SPONSORS = (ev.sponsors || []).filter(function (sp) { return sp && sp.logo; })
-    .map(function (sp) { return { name: sp.name || '', logo: sp.logo, link: sp.link || '' }; });
+    .map(function (sp) { return { name: sp.name || '', logo: sp.logo, link: sp.link || '', tier: sp.tier || '' }; });
   renderSponsors();
   setVal('evMoncash', ev.moncashNumber);
   setVal('evNatcash', ev.natcashNumber);
@@ -2431,6 +2435,16 @@ var SP_TXT = {
         hint: '✨ Flyers com IA (3 designs profissionais, 500 HTG): termine e publique o evento, depois toque em "🎨 Criar 3 flyers com IA".' }
 };
 function spT(k) { var l = SP_TXT[curLang] || SP_TXT.ht; return l[k] || SP_TXT.ht[k]; }
+/* 4 Nov 2026 (Jeffery): sponsor levels - Main, Gold, Silver, Official Partners. Bigger and higher on the ticket. */
+var SP_TIERS = ['main', 'gold', 'silver', 'partner'];
+var SP_TIER_T = {
+  ht: { main: '🥇 Sponsò Prensipal', gold: '🟡 Sponsò Gold', silver: '⚪ Sponsò Silver', partner: '🤝 Patnè Ofisyèl' },
+  fr: { main: '🥇 Sponsor principal', gold: '🟡 Sponsor Or', silver: '⚪ Sponsor Argent', partner: '🤝 Partenaire officiel' },
+  en: { main: '🥇 Main Sponsor', gold: '🟡 Gold Sponsor', silver: '⚪ Silver Sponsor', partner: '🤝 Official Partner' },
+  es: { main: '🥇 Patrocinador principal', gold: '🟡 Patrocinador Oro', silver: '⚪ Patrocinador Plata', partner: '🤝 Socio oficial' },
+  pt: { main: '🥇 Patrocinador principal', gold: '🟡 Patrocinador Ouro', silver: '⚪ Patrocinador Prata', partner: '🤝 Parceiro oficial' }
+};
+function spTier(k) { var l = SP_TIER_T[curLang] || SP_TIER_T.ht; return l[k] || SP_TIER_T.ht[k]; }
 function spEsc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 function spErr(msg) { var e = document.getElementById('spErr'); if (!e) return; e.textContent = msg || ''; e.style.display = msg ? 'block' : 'none'; }
 
@@ -2443,7 +2457,8 @@ function renderSponsors() {
     return '<div class="sp-row"><img class="sp-logo" alt="" src="' + spEsc(sp.logo) + '">' +
       '<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px">' +
       '<input type="text" maxlength="60" placeholder="' + spEsc(spT('name')) + '" value="' + spEsc(sp.name) + '" oninput="SPONSORS[' + i + '].name=this.value">' +
-      '<input type="url" maxlength="200" placeholder="' + spEsc(spT('link')) + '" value="' + spEsc(sp.link) + '" oninput="SPONSORS[' + i + '].link=this.value"></div>' +
+      '<input type="url" maxlength="200" placeholder="' + spEsc(spT('link')) + '" value="' + spEsc(sp.link) + '" oninput="SPONSORS[' + i + '].link=this.value">' +
+      '<select onchange="SPONSORS[' + i + '].tier=this.value">' + SP_TIERS.map(function (k) { return '<option value="' + k + '"' + ((sp.tier || 'partner') === k ? ' selected' : '') + '>' + spTier(k) + '</option>'; }).join('') + '</select></div>' +
       '<div class="sp-acts" style="flex-direction:column">' +
       '<button type="button" aria-label="up" onclick="moveSponsor(' + i + ',-1)"' + (i === 0 ? ' disabled' : '') + '>↑</button>' +
       '<button type="button" aria-label="down" onclick="moveSponsor(' + i + ',1)"' + (i === SPONSORS.length - 1 ? ' disabled' : '') + '>↓</button>' +
@@ -2452,11 +2467,33 @@ function renderSponsors() {
   var add = document.getElementById('spAddBtn');
   if (add) add.style.display = SPONSORS.length >= SP_MAX ? 'none' : '';
 }
+var SP_IMG = {};
+function spImg(src) {
+  if (SP_IMG[src]) return SP_IMG[src];
+  var im = new Image(); im.onload = function () { try { renderCanvas(); } catch (e) {} }; im.src = src; SP_IMG[src] = im; return im;
+}
+function drawSponsorBand(ctx, w, h) {
+  var ims = SPONSORS.filter(function (sp) { return sp && sp.logo; }).map(function (sp) { return spImg(sp.logo); })
+    .filter(function (im) { return im.complete && im.naturalWidth; });
+  if (!ims.length) return;
+  var bandH = h * 0.12, y = h * 0.8, pad = w * 0.04, maxH = bandH * 0.62, gap = w * 0.035;
+  var sizes = ims.map(function (im) { var hh = maxH, ww = im.naturalWidth / im.naturalHeight * hh; return [ww, hh]; });
+  var total = sizes.reduce(function (a, s) { return a + s[0]; }, 0) + gap * (ims.length - 1), k = Math.min(1, (w - pad * 2 - w * 0.06) / total);
+  ctx.save(); ctx.globalAlpha = 0.92; ctx.fillStyle = '#ffffff';
+  var bw = Math.min(w - pad * 2, total * k + w * 0.06), bx = (w - bw) / 2, r = bandH * 0.18;
+  ctx.beginPath(); ctx.moveTo(bx + r, y); ctx.arcTo(bx + bw, y, bx + bw, y + bandH, r); ctx.arcTo(bx + bw, y + bandH, bx, y + bandH, r);
+  ctx.arcTo(bx, y + bandH, bx, y, r); ctx.arcTo(bx, y, bx + bw, y, r); ctx.closePath(); ctx.fill(); ctx.globalAlpha = 1;
+  var x = (w - total * k) / 2;
+  ims.forEach(function (im, i) { var ww = sizes[i][0] * k, hh = sizes[i][1] * k; ctx.drawImage(im, x, y + (bandH - hh) / 2, ww, hh); x += ww + gap * k; });
+  ctx.restore();
+}
 function moveSponsor(i, d) {
   var j = i + d; if (j < 0 || j >= SPONSORS.length) return;
   var x = SPONSORS[i]; SPONSORS[i] = SPONSORS[j]; SPONSORS[j] = x; renderSponsors();
 }
 function removeSponsor(i) { SPONSORS.splice(i, 1); spErr(''); renderSponsors(); }
+/* the invitation preview follows the sponsor list */
+(function () { var r0 = renderSponsors; renderSponsors = function () { r0(); try { renderCanvas(); } catch (e) {} }; })();
 
 /* Scale only. Transparent logos stay transparent (PNG); if that is still too
    big for the event document, the same pixels go out as WebP, then JPEG. */
@@ -2480,7 +2517,7 @@ function addSponsorFile(input) {
     }
     if (out.length > 190000) { spErr(spT('bad')); return; }
     spErr('');
-    SPONSORS.push({ name: (f.name || '').replace(/\.[a-z0-9]+$/i, '').replace(/[_-]+/g, ' ').slice(0, 60), logo: out, link: '' });
+    SPONSORS.push({ name: (f.name || '').replace(/\.[a-z0-9]+$/i, '').replace(/[_-]+/g, ' ').slice(0, 60), logo: out, link: '', tier: SPONSORS.length ? 'partner' : 'main' });
     renderSponsors();
   };
   img.onerror = function () { URL.revokeObjectURL(url); spErr(spT('bad')); };
@@ -2556,12 +2593,14 @@ function publishEvent() {
     organizerEmail: document.getElementById('evOrgEmail').value || '',
     hostedBy: document.getElementById('hostedBy') ? document.getElementById('hostedBy').value : '',
     inviteImage: inviteImage,
-    sponsors: SPONSORS.map(function (sp) { return { name: sp.name || '', logo: sp.logo, link: sp.link || '' }; }),
+    sponsors: SPONSORS.map(function (sp) { return { name: sp.name || '', logo: sp.logo, link: sp.link || '', tier: sp.tier || '' }; }),
     tickets: tickets,
     paymentMethods: payMethods,
     moncashNumber: document.getElementById('moncashInput') ? (document.getElementById('moncashInput').querySelector('input') || {}).value || '' : '',
     natcashNumber: document.getElementById('natcashInput') ? (document.getElementById('natcashInput').querySelector('input') || {}).value || '' : '',
-    koutyeEnabled: document.getElementById('koutyeToggle') ? document.getElementById('koutyeToggle').checked : false,
+    /* 4 Nov 2026: the switch is a div toggled by its "on" class - reading .checked (undefined) saved EVERY event with
+       Ajan sharing off, so the "Pataje ak touche komisyon" banner never appeared on any event. */
+    koutyeEnabled: document.getElementById('koutyeToggle') ? document.getElementById('koutyeToggle').classList.contains('on') : false,
     creatorPct: document.getElementById('creatorPct') ? parseInt(document.getElementById('creatorPct').value) || 0 : 0,
     createdAt: new Date().toISOString()
   };

@@ -171,6 +171,8 @@ input:focus{outline:none;border-color:var(--blue)}
       <div class="evtitle" id="evTitle"></div>
       <div class="evdate" id="evDate"></div>
     </div>
+    <!-- 4 Nov 2026 (Jeffery): the organizer sees his paid sales, his money and who is inside - without asking anybody -->
+    <div id="salesBox" style="display:none"></div>
     <div class="tiles">
       <div class="tile yes"><div class="v" id="tGoing">0</div><div class="l" id="lGoing"></div></div>
       <div class="tile"><div class="v" id="tPeople">0</div><div class="l" id="lPeople"></div></div>
@@ -209,6 +211,58 @@ input:focus{outline:none;border-color:var(--blue)}
    It is never part of the public event page, which carries only the count.
    ═══════════════════════════════════════════════════════════════════════════ */
 var API_URL = 'https://haitibiznis-api.onrender.com';
+
+/* ═══ ORGANIZER DASHBOARD (4 Nov 2026) ═══ */
+var ST = {
+  ht: { h:'💰 Vant tikè & antre', sold:'Tikè vann', money:'Lajan ou (HTG)', inside:'Moun ki antre', byT:'Pa tip tikè', list:'Achtè yo', fee:'Frè sèvis 7.5% achtè yo peye anplis (pou Tikè Lakay): HTG {f}. Ou resevwa 100% pri tikè yo.', payout:'Peman: apre evènman an (3–5 jou ouvrab), apre verifikasyon.', door:'🚪 Kòd pòt ou', doorHelp:'Bay moun k ap eskane yo kòd sa a. Yo louvri tikelakay.com/check.html, mete kòd la, epi eskane QR yo.', none:'Poko gen tikè peye.', free:'enskripsyon gratis', inN:'{i}/{q} antre', live:'Mizajou otomatik chak 30 segonn', csv:'⬇️ Telechaje vant yo (CSV)' },
+  fr: { h:'💰 Ventes & entrées', sold:'Billets vendus', money:'Votre argent (HTG)', inside:'Entrées', byT:'Par type de billet', list:'Acheteurs', fee:'Frais de service 7,5 % payés en plus par les acheteurs (Tikè Lakay) : HTG {f}. Vous recevez 100 % du prix des billets.', payout:'Paiement : après l’événement (3–5 jours ouvrables), après vérification.', door:'🚪 Votre code de porte', doorHelp:'Donnez ce code aux personnes qui scannent. Elles ouvrent tikelakay.com/check.html, saisissent le code et scannent les QR.', none:'Pas encore de billets payés.', free:'inscriptions gratuites', inN:'{i}/{q} entrés', live:'Mise à jour automatique toutes les 30 secondes', csv:'⬇️ Télécharger les ventes (CSV)' },
+  en: { h:'💰 Sales & check-ins', sold:'Tickets sold', money:'Your money (HTG)', inside:'Checked in', byT:'By ticket type', list:'Buyers', fee:'7.5% service fee paid on top by buyers (Tikè Lakay): HTG {f}. You receive 100% of the ticket prices.', payout:'Payout: after the event (3–5 business days), after verification.', door:'🚪 Your door code', doorHelp:'Give this code to the people scanning. They open tikelakay.com/check.html, enter the code and scan the QRs.', none:'No paid tickets yet.', free:'free registrations', inN:'{i}/{q} in', live:'Updates by itself every 30 seconds', csv:'⬇️ Download sales (CSV)' },
+  es: { h:'💰 Ventas y entradas', sold:'Boletos vendidos', money:'Su dinero (HTG)', inside:'Entraron', byT:'Por tipo de boleto', list:'Compradores', fee:'Tarifa de servicio 7,5 % pagada aparte por los compradores (Tikè Lakay): HTG {f}. Usted recibe el 100 % del precio.', payout:'Pago: después del evento (3–5 días hábiles), tras verificación.', door:'🚪 Su código de puerta', doorHelp:'Dé este código a quienes escanean. Abren tikelakay.com/check.html, ponen el código y escanean los QR.', none:'Aún no hay boletos pagados.', free:'inscripciones gratis', inN:'{i}/{q} dentro', live:'Se actualiza solo cada 30 segundos', csv:'⬇️ Descargar ventas (CSV)' },
+  pt: { h:'💰 Vendas e entradas', sold:'Ingressos vendidos', money:'Seu dinheiro (HTG)', inside:'Entraram', byT:'Por tipo de ingresso', list:'Compradores', fee:'Taxa de serviço 7,5 % paga à parte pelos compradores (Tikè Lakay): HTG {f}. Você recebe 100 % do preço.', payout:'Pagamento: depois do evento (3–5 dias úteis), após verificação.', door:'🚪 Seu código de porta', doorHelp:'Dê este código a quem escaneia. Abrem tikelakay.com/check.html, põem o código e escaneiam os QR.', none:'Ainda não há ingressos pagos.', free:'inscrições grátis', inN:'{i}/{q} dentro', live:'Atualiza sozinho a cada 30 segundos', csv:'⬇️ Baixar vendas (CSV)' }
+};
+function st(k){ return (ST[lang] && ST[lang][k]) || ST.ht[k] || k; }
+var sales = null, salesTimer = null;
+function money(n){ return String(Math.round(Number(n) || 0)).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function escS(v){ return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function loadSales(code){
+  fetch(API_URL + '/api/events/' + encodeURIComponent(EVENT_ID) + '/sales', { headers: { 'x-manage-code': code, 'x-admin-pin': code } })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){ if (!d) return; sales = d; renderSales(); })
+    .catch(function(){});
+  clearTimeout(salesTimer);
+  salesTimer = setTimeout(function(){ if (!document.hidden) loadSales(code); else salesTimer = setTimeout(function(){ loadSales(code); }, 30000); }, 30000);
+}
+function renderSales(){
+  var b = document.getElementById('salesBox'); if (!b || !sales) return;
+  var T = sales.totals || {}, h = '';
+  h += '<div class="card" style="padding:16px 18px"><div style="font-weight:800;font-size:1.05rem;margin-bottom:10px">' + st('h') + '</div>' +
+    '<div class="tiles" style="margin:0 0 12px"><div class="tile yes"><div class="v">' + money(T.tickets) + '</div><div class="l">' + st('sold') + (T.capacity ? ' / ' + money(T.capacity) : '') + '</div></div>' +
+    '<div class="tile"><div class="v">' + money(T.revenue) + '</div><div class="l">' + st('money') + '</div></div>' +
+    '<div class="tile"><div class="v">' + money(T.inside) + '</div><div class="l">' + st('inside') + '</div></div></div>' +
+    '<div class="hint" style="margin:0 0 6px">' + st('fee').replace('{f}', money(T.fees)) + (T.free ? ' · ' + money(T.free) + ' ' + st('free') : '') + '</div>' +
+    '<div class="hint" style="margin:0 0 10px">' + st('payout') + '</div>';
+  if ((sales.byTicket || []).length) h += '<div style="font-weight:800;margin:6px 0">' + st('byT') + '</div>' + sales.byTicket.map(function(x){
+      return '<div style="display:flex;justify-content:space-between;gap:8px;border-top:1px solid #EEF1F6;padding:7px 0;font-size:.9rem"><span><b>' + escS(x.name) + '</b> · HTG ' + money(x.price) + '</span><span>' + money(x.sold) + ' · HTG ' + money(x.revenue) + ' · 🚪 ' + money(x.inside) + '</span></div>';
+    }).join('');
+  if (sales.doorCode) h += '<div style="margin-top:12px;background:#0A0E1A;color:#fff;border-radius:12px;padding:12px 14px"><div style="font-weight:800">' + st('door') + ': <span style="font-family:JetBrains Mono,monospace;font-size:1.25rem;letter-spacing:3px">' + escS(sales.doorCode) + '</span></div><div style="font-size:.8rem;opacity:.8;margin-top:4px">' + st('doorHelp') + '</div></div>';
+  h += '</div>';
+  var L = sales.sales || [];
+  h += '<div class="card" style="padding:14px 16px"><div style="font-weight:800;margin-bottom:6px">' + st('list') + ' (' + L.length + ')</div>' + (L.length ? L.map(function(x){
+      return '<div style="border-top:1px solid #EEF1F6;padding:8px 0;font-size:.88rem"><div style="display:flex;justify-content:space-between;gap:8px"><b>' + escS(x.name || '—') + '</b><span>' + (x.paid ? 'HTG ' + money(x.amount) : 'Gratis') + '</span></div>' +
+        '<div style="color:#5A6B8A">' + escS(x.phone) + ' · ' + escS(x.ticket) + ' ×' + x.qty + ' · ' + escS(x.ref) + '</div>' +
+        '<div style="font-weight:700;color:' + (x.inside ? '#1B8C3D' : '#5A6B8A') + '">🚪 ' + st('inN').replace('{i}', x.inside).replace('{q}', x.qty) + '</div></div>';
+    }).join('') : '<div class="hint">' + st('none') + '</div>') +
+    '<div class="tools" style="margin-top:8px"><button class="btn-ghost" onclick="salesCsv()">' + st('csv') + '</button></div><p class="hint">' + st('live') + '</p></div>';
+  b.innerHTML = h; b.style.display = '';
+}
+function salesCsv(){
+  if (!sales) return;
+  var q = function(v){ v = String(v == null ? '' : v); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; };
+  var rows = [['ref','name','phone','ticket','qty','amount_htg','paid','method','paid_at','checked_in']].concat((sales.sales || []).map(function(x){
+    return [x.ref, x.name, x.phone, x.ticket, x.qty, x.amount, x.paid ? 'yes' : 'no', x.method, x.paidAt, x.inside]; }));
+  var blob = new Blob(['\ufeff' + rows.map(function(r){ return r.map(q).join(','); }).join('\n')], { type: 'text/csv' });
+  var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'vant-' + EVENT_ID + '.csv'; document.body.appendChild(a); a.click(); a.remove();
+}
 
 var I18N = {
   ht: {
@@ -440,6 +494,7 @@ function load(isRefresh){
       document.getElementById('gate').style.display = 'none';
       document.getElementById('result').style.display = 'block';
       render();
+      loadSales(code);
     })
     .catch(function(){ errEl.textContent = t('err'); errEl.style.display = 'block'; })
     .then(function(){

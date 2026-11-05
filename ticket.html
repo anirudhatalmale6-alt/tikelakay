@@ -287,6 +287,13 @@ img{max-width:100%;display:block}
 .tk-sponsors .lbl{font-size:.66rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#8A95AA;margin-bottom:8px}
 .tk-sponsors .row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 14px}
 .tk-sponsors img{height:34px;max-width:96px;object-fit:contain}
+/* 4 Nov 2026: sponsor levels - each level its own row, bigger for higher levels; all BELOW the QR, never over it */
+.tk-sponsors .tier{margin-top:10px}.tk-sponsors .tier:first-of-type{margin-top:0}
+.tk-sponsors .tl{font-size:.6rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#8A95AA;margin-bottom:6px}
+.tk-sponsors .tier.main img{height:64px;max-width:200px}.tk-sponsors .tier.main .tl{color:#B8860B}
+.tk-sponsors .tier.gold img{height:46px;max-width:140px}.tk-sponsors .tier.gold .tl{color:#C9A227}
+.tk-sponsors .tier.silver img{height:34px;max-width:110px}.tk-sponsors .tier.silver .tl{color:#7C8796}
+.tk-sponsors .tier.partner img{height:26px;max-width:84px}
 .ticket-watermark{
   position:absolute;bottom:8px;right:14px;
   font-family:var(--display);font-size:.55rem;
@@ -403,9 +410,17 @@ img{max-width:100%;display:block}
         <div class="qr-frame">
           <div class="qr-placeholder" id="qrPlaceholder"><span data-i18n="loadingQr">Ap chaje QR...</span></div>
           <img class="qr-img" id="qrImg" style="display:none" alt="QR Code">
+
           <div class="qr-wait" id="qrWait" style="display:none"><canvas id="qrDecoy" width="200" height="200"></canvas>
             <div class="qw-t" id="qwT"></div><div class="qw-s" id="qwS"></div><div class="qw-c" id="qwC"></div></div>
         </div>
+        <!-- 4 Nov 2026: one QR per attendee - pick the person, each QR scans once -->
+          <div id="passBar" style="display:none;margin-top:10px;text-align:center">
+            <div id="passLbl" style="font-weight:800;font-size:.95rem;margin-bottom:6px"></div>
+            <div id="passTabs" style="display:flex;flex-wrap:wrap;gap:6px;justify-content:center"></div>
+            <div id="passNote" style="font-size:.72rem;color:#5A6B8A;margin-top:6px"></div>
+            <button type="button" id="passShare" style="margin-top:8px;border:0;border-radius:10px;padding:9px 12px;font-weight:800;background:#25D366;color:#fff;cursor:pointer"></button>
+          </div>
         <div class="ref-id" id="tRef"></div>
         <div class="ticket-details">
           <div class="ticket-detail-row"><span class="tdl" data-i18n="ticketType">Tip Tikè</span><span class="tdv" id="tTicketName"></span></div>
@@ -419,6 +434,8 @@ img{max-width:100%;display:block}
         </div>
       </div>
       <div class="tk-sponsors" id="tkSponsors"><div class="lbl" id="tkSpLbl">Sponsò Ofisyèl</div><div class="row" id="tkSpRow"></div></div>
+      <!-- 4 Nov 2026 (Jeffery): the final-sale policy, on the ticket itself (inside the card, so a saved ticket carries it) -->
+      <div id="tkFinal" data-i18n="finalSale" style="padding:8px 18px 14px;text-align:center;font-size:.72rem;font-weight:800;color:#8A5A00;letter-spacing:.02em">🔒 VANT FINAL · san ranbousman, sof si evènman an anile.</div>
       <div class="ticket-watermark">Tikè Lakay</div>
     </div>
   </div>
@@ -531,11 +548,11 @@ var ticketData = null;
 var eventData = null;
 
 var i18n = {
-  ht: { saveT:'📸 Sove tikè ou', saveS:'Kenbe lyen tikè sa a. Ou ka toujou jwenn li ankò sou tikelakay.com/my-tickets.html ak nimewo telefòn ou. QR kòd la parèt 2 èdtan anvan evènman an.', qrWait:'QR kòd la ap parèt {when}', qrWaitSub:'2 èdtan anvan evènman an. Tounen sou paj sa a nan moman sa a.', qrIn:'Nan {t}', qrCancelled:'Evènman sa a anile.', saveLink:'→ Tikè mwen yo', back:'Retounen', loadingTicket:'Ap chaje tikè ou...', ticketNotFound:'Tikè pa jwenn', ticketNotFoundSub:'Verifye referans ou a epi eseye ankò.', browseEvents:'Gade Evènman', confirmed:'KONFIME', pending:'AN ATANT', failed:'ECHWE', ticketType:'Tip Tikè', quantity:'Kantite', attendee:'Patisipan', downloadTicket:'Telechaje Tikè', addCalendar:'Kalandriye', copy:'Kopye', copied:'Kopye!', scanHint:'Montre QR code sa a nan antre a', loadingQr:'Ap chaje QR...', free:'GRATIS', mswTitle:'Bezwen transpò pou jou evènman an?', mswDesc:'Rezève yon machin oswa moto kounye a — tout bagay deja ranpli pou ou!', mswBtn:'Rezève Transpò', tlTitle:'W AP ÒGANIZE YON EVÈNMAN?', tlDesc:'Kreye evènman ou sou Tikè Lakay, vann tikè sou entènèt epi aksepte peman ak MonCash ak NatCash.', tlBtn:'KREYE EVÈNMAN MWEN', navHome:'Akèy', navEvents:'Evènman', navCreate:'Kreye', navTickets:'Tikè', navAccount:'Kont' },
-  fr: { saveT:'📸 Gardez votre billet', saveS:'Gardez le lien de ce billet. Vous pouvez toujours le retrouver sur tikelakay.com/my-tickets.html avec votre numéro de téléphone. Le QR code apparaît 2 heures avant l’événement.', qrWait:'Le QR code apparaîtra {when}', qrWaitSub:'2 heures avant l’événement. Revenez sur cette page à ce moment-là.', qrIn:'Dans {t}', qrCancelled:'Cet événement est annulé.', saveLink:'→ Mes billets', back:'Retour', loadingTicket:'Chargement du billet...', ticketNotFound:'Billet introuvable', ticketNotFoundSub:'Vérifiez votre référence et réessayez.', browseEvents:'Voir les événements', confirmed:'CONFIRMÉ', pending:'EN ATTENTE', failed:'ÉCHOUÉ', ticketType:'Type de Billet', quantity:'Quantité', attendee:'Participant', downloadTicket:'Télécharger', addCalendar:'Calendrier', copy:'Copier', copied:'Copié!', scanHint:'Présentez ce QR code à l\'entrée', loadingQr:'Chargement QR...', free:'GRATUIT', mswTitle:'Besoin de transport pour le jour de l\'événement?', mswDesc:'Réservez une voiture ou moto maintenant — tout est pré-rempli!', mswBtn:'Réserver Transport', tlTitle:'VOUS ORGANISEZ UN ÉVÉNEMENT?', tlDesc:'Créez votre événement sur Tikè Lakay, vendez vos billets en ligne et acceptez MonCash et NatCash.', tlBtn:'CRÉER MON ÉVÉNEMENT', navHome:'Accueil', navEvents:'Événements', navCreate:'Créer', navTickets:'Billets', navAccount:'Compte' },
-  en: { saveT:'📸 Save your ticket', saveS:'Keep this ticket’s link. You can always find it again at tikelakay.com/my-tickets.html with your phone number. The QR code appears 2 hours before the event.', qrWait:'The QR code will appear {when}', qrWaitSub:'2 hours before the event. Come back to this page then.', qrIn:'In {t}', qrCancelled:'This event is cancelled.', saveLink:'→ My tickets', back:'Back', loadingTicket:'Loading your ticket...', ticketNotFound:'Ticket not found', ticketNotFoundSub:'Check your reference and try again.', browseEvents:'Browse Events', confirmed:'CONFIRMED', pending:'PENDING', failed:'FAILED', ticketType:'Ticket Type', quantity:'Quantity', attendee:'Attendee', downloadTicket:'Download', addCalendar:'Calendar', copy:'Copy', copied:'Copied!', scanHint:'Show this QR code at the entrance', loadingQr:'Loading QR...', free:'FREE', mswTitle:'Need a ride to the event?', mswDesc:'Book a car or moto now — everything is pre-filled for you!', mswBtn:'Book Transport', tlTitle:'ARE YOU ORGANISING AN EVENT?', tlDesc:'Create your event on Tikè Lakay, sell tickets online and accept MonCash and NatCash.', tlBtn:'CREATE MY EVENT', navHome:'Home', navEvents:'Events', navCreate:'Create', navTickets:'Tickets', navAccount:'Account' },
-  pt: { saveT:'📸 Guarde o seu ingresso', saveS:'Guarde o link deste ingresso. Você sempre o encontra de novo em tikelakay.com/my-tickets.html com o seu número de telefone. O QR code aparece 2 horas antes do evento.', qrWait:'O QR code aparecerá {when}', qrWaitSub:'2 horas antes do evento. Volte a esta página nessa hora.', qrIn:'Em {t}', qrCancelled:'Este evento foi cancelado.', saveLink:'→ Meus ingressos', back:'Voltar', loadingTicket:'Carregando o seu ingresso...', ticketNotFound:'Ingresso não encontrado', ticketNotFoundSub:'Confira a referência e tente de novo.', browseEvents:'Ver eventos', confirmed:'CONFIRMADO', pending:'PENDENTE', failed:'FALHOU', ticketType:'Tipo de ingresso', quantity:'Quantidade', attendee:'Participante', downloadTicket:'Baixar', addCalendar:'Agenda', copy:'Copiar', copied:'Copiado!', scanHint:'Mostre este QR Code na entrada', loadingQr:'Carregando o QR...', free:'GRÁTIS', mswTitle:'Precisa de transporte para o evento?', mswDesc:'Peça um carro ou moto agora — já deixamos tudo preenchido para você!', mswBtn:'Pedir transporte', tlTitle:'VOCÊ ESTÁ ORGANIZANDO UM EVENTO?', tlDesc:'Crie o seu evento no Tikè Lakay, venda ingressos online e aceite MonCash e NatCash.', tlBtn:'CRIAR MEU EVENTO', navHome:'Início', navEvents:'Eventos', navCreate:'Criar', navTickets:'Ingressos', navAccount:'Conta' },
-  es: { saveT:'📸 Guarda tu boleto', saveS:'Guarda el enlace de este boleto. Siempre puedes encontrarlo de nuevo en tikelakay.com/my-tickets.html con tu número de teléfono. El código QR aparece 2 horas antes del evento.', qrWait:'El código QR aparecerá {when}', qrWaitSub:'2 horas antes del evento. Vuelve a esta página en ese momento.', qrIn:'En {t}', qrCancelled:'Este evento está cancelado.', saveLink:'→ Mis boletos', back:'Volver', loadingTicket:'Cargando tu boleto...', ticketNotFound:'Boleto no encontrado', ticketNotFoundSub:'Verifica tu referencia e intenta de nuevo.', browseEvents:'Ver Eventos', confirmed:'CONFIRMADO', pending:'PENDIENTE', failed:'FALLIDO', ticketType:'Tipo de Boleto', quantity:'Cantidad', attendee:'Asistente', downloadTicket:'Descargar', addCalendar:'Calendario', copy:'Copiar', copied:'¡Copiado!', scanHint:'Muestra este código QR en la entrada', loadingQr:'Cargando QR...', free:'GRATIS', mswTitle:'Necesitas transporte para el evento?', mswDesc:'Reserva un carro o moto ahora — todo pre-llenado!', mswBtn:'Reservar Transporte', tlTitle:'¿ESTÁS ORGANIZANDO UN EVENTO?', tlDesc:'Crea tu evento en Tikè Lakay, vende boletos en línea y acepta MonCash y NatCash.', tlBtn:'CREAR MI EVENTO', navHome:'Inicio', navEvents:'Eventos', navCreate:'Crear', navTickets:'Boletos', navAccount:'Cuenta' }
+  ht: { passN:'Moun {n} / {of}', passIn:'✅ Li antre', passShare:'📲 Voye QR sa a bay moun nan', passNote:'Chak moun gen PWÒP QR pa l. Pataje QR chak moun ba li.', finalSale:'🔒 VANT FINAL · san ranbousman, sof si evènman an anile.', saveT:'📸 Sove tikè ou', saveS:'Kenbe lyen tikè sa a. Ou ka toujou jwenn li ankò sou tikelakay.com/my-tickets.html ak nimewo telefòn ou. QR kòd la parèt 2 èdtan anvan evènman an.', qrWait:'QR kòd la ap parèt {when}', qrWaitSub:'2 èdtan anvan evènman an. Tounen sou paj sa a nan moman sa a.', qrIn:'Nan {t}', qrCancelled:'Evènman sa a anile.', saveLink:'→ Tikè mwen yo', back:'Retounen', loadingTicket:'Ap chaje tikè ou...', ticketNotFound:'Tikè pa jwenn', ticketNotFoundSub:'Verifye referans ou a epi eseye ankò.', browseEvents:'Gade Evènman', confirmed:'KONFIME', pending:'AN ATANT', failed:'ECHWE', ticketType:'Tip Tikè', quantity:'Kantite', attendee:'Patisipan', downloadTicket:'Telechaje Tikè', addCalendar:'Kalandriye', copy:'Kopye', copied:'Kopye!', scanHint:'Montre QR code sa a nan antre a', loadingQr:'Ap chaje QR...', free:'GRATIS', mswTitle:'Bezwen transpò pou jou evènman an?', mswDesc:'Rezève yon machin oswa moto kounye a — tout bagay deja ranpli pou ou!', mswBtn:'Rezève Transpò', tlTitle:'W AP ÒGANIZE YON EVÈNMAN?', tlDesc:'Kreye evènman ou sou Tikè Lakay, vann tikè sou entènèt epi aksepte peman ak MonCash ak NatCash.', tlBtn:'KREYE EVÈNMAN MWEN', navHome:'Akèy', navEvents:'Evènman', navCreate:'Kreye', navTickets:'Tikè', navAccount:'Kont' },
+  fr: { passN:'Personne {n} / {of}', passIn:'✅ Entré(e)', passShare:'📲 Envoyer ce QR à la personne', passNote:'Chaque personne a SON propre QR. Partagez à chacun le sien.', finalSale:'🔒 VENTE FINALE · sans remboursement, sauf annulation de l’événement.', saveT:'📸 Gardez votre billet', saveS:'Gardez le lien de ce billet. Vous pouvez toujours le retrouver sur tikelakay.com/my-tickets.html avec votre numéro de téléphone. Le QR code apparaît 2 heures avant l’événement.', qrWait:'Le QR code apparaîtra {when}', qrWaitSub:'2 heures avant l’événement. Revenez sur cette page à ce moment-là.', qrIn:'Dans {t}', qrCancelled:'Cet événement est annulé.', saveLink:'→ Mes billets', back:'Retour', loadingTicket:'Chargement du billet...', ticketNotFound:'Billet introuvable', ticketNotFoundSub:'Vérifiez votre référence et réessayez.', browseEvents:'Voir les événements', confirmed:'CONFIRMÉ', pending:'EN ATTENTE', failed:'ÉCHOUÉ', ticketType:'Type de Billet', quantity:'Quantité', attendee:'Participant', downloadTicket:'Télécharger', addCalendar:'Calendrier', copy:'Copier', copied:'Copié!', scanHint:'Présentez ce QR code à l\'entrée', loadingQr:'Chargement QR...', free:'GRATUIT', mswTitle:'Besoin de transport pour le jour de l\'événement?', mswDesc:'Réservez une voiture ou moto maintenant — tout est pré-rempli!', mswBtn:'Réserver Transport', tlTitle:'VOUS ORGANISEZ UN ÉVÉNEMENT?', tlDesc:'Créez votre événement sur Tikè Lakay, vendez vos billets en ligne et acceptez MonCash et NatCash.', tlBtn:'CRÉER MON ÉVÉNEMENT', navHome:'Accueil', navEvents:'Événements', navCreate:'Créer', navTickets:'Billets', navAccount:'Compte' },
+  en: { passN:'Person {n} / {of}', passIn:'✅ Checked in', passShare:'📲 Send this QR to the person', passNote:'Each person has their OWN QR. Share each one with its person.', finalSale:'🔒 FINAL SALE · no refund, unless the event is cancelled.', saveT:'📸 Save your ticket', saveS:'Keep this ticket’s link. You can always find it again at tikelakay.com/my-tickets.html with your phone number. The QR code appears 2 hours before the event.', qrWait:'The QR code will appear {when}', qrWaitSub:'2 hours before the event. Come back to this page then.', qrIn:'In {t}', qrCancelled:'This event is cancelled.', saveLink:'→ My tickets', back:'Back', loadingTicket:'Loading your ticket...', ticketNotFound:'Ticket not found', ticketNotFoundSub:'Check your reference and try again.', browseEvents:'Browse Events', confirmed:'CONFIRMED', pending:'PENDING', failed:'FAILED', ticketType:'Ticket Type', quantity:'Quantity', attendee:'Attendee', downloadTicket:'Download', addCalendar:'Calendar', copy:'Copy', copied:'Copied!', scanHint:'Show this QR code at the entrance', loadingQr:'Loading QR...', free:'FREE', mswTitle:'Need a ride to the event?', mswDesc:'Book a car or moto now — everything is pre-filled for you!', mswBtn:'Book Transport', tlTitle:'ARE YOU ORGANISING AN EVENT?', tlDesc:'Create your event on Tikè Lakay, sell tickets online and accept MonCash and NatCash.', tlBtn:'CREATE MY EVENT', navHome:'Home', navEvents:'Events', navCreate:'Create', navTickets:'Tickets', navAccount:'Account' },
+  pt: { passN:'Pessoa {n} / {of}', passIn:'✅ Entrou', passShare:'📲 Enviar este QR à pessoa', passNote:'Cada pessoa tem o SEU próprio QR. Partilhe com cada uma.', finalSale:'🔒 VENDA FINAL · sem reembolso, salvo cancelamento do evento.', saveT:'📸 Guarde o seu ingresso', saveS:'Guarde o link deste ingresso. Você sempre o encontra de novo em tikelakay.com/my-tickets.html com o seu número de telefone. O QR code aparece 2 horas antes do evento.', qrWait:'O QR code aparecerá {when}', qrWaitSub:'2 horas antes do evento. Volte a esta página nessa hora.', qrIn:'Em {t}', qrCancelled:'Este evento foi cancelado.', saveLink:'→ Meus ingressos', back:'Voltar', loadingTicket:'Carregando o seu ingresso...', ticketNotFound:'Ingresso não encontrado', ticketNotFoundSub:'Confira a referência e tente de novo.', browseEvents:'Ver eventos', confirmed:'CONFIRMADO', pending:'PENDENTE', failed:'FALHOU', ticketType:'Tipo de ingresso', quantity:'Quantidade', attendee:'Participante', downloadTicket:'Baixar', addCalendar:'Agenda', copy:'Copiar', copied:'Copiado!', scanHint:'Mostre este QR Code na entrada', loadingQr:'Carregando o QR...', free:'GRÁTIS', mswTitle:'Precisa de transporte para o evento?', mswDesc:'Peça um carro ou moto agora — já deixamos tudo preenchido para você!', mswBtn:'Pedir transporte', tlTitle:'VOCÊ ESTÁ ORGANIZANDO UM EVENTO?', tlDesc:'Crie o seu evento no Tikè Lakay, venda ingressos online e aceite MonCash e NatCash.', tlBtn:'CRIAR MEU EVENTO', navHome:'Início', navEvents:'Eventos', navCreate:'Criar', navTickets:'Ingressos', navAccount:'Conta' },
+  es: { passN:'Persona {n} / {of}', passIn:'✅ Entró', passShare:'📲 Enviar este QR a la persona', passNote:'Cada persona tiene SU propio QR. Comparta a cada una el suyo.', finalSale:'🔒 VENTA FINAL · sin reembolso, salvo cancelación del evento.', saveT:'📸 Guarda tu boleto', saveS:'Guarda el enlace de este boleto. Siempre puedes encontrarlo de nuevo en tikelakay.com/my-tickets.html con tu número de teléfono. El código QR aparece 2 horas antes del evento.', qrWait:'El código QR aparecerá {when}', qrWaitSub:'2 horas antes del evento. Vuelve a esta página en ese momento.', qrIn:'En {t}', qrCancelled:'Este evento está cancelado.', saveLink:'→ Mis boletos', back:'Volver', loadingTicket:'Cargando tu boleto...', ticketNotFound:'Boleto no encontrado', ticketNotFoundSub:'Verifica tu referencia e intenta de nuevo.', browseEvents:'Ver Eventos', confirmed:'CONFIRMADO', pending:'PENDIENTE', failed:'FALLIDO', ticketType:'Tipo de Boleto', quantity:'Cantidad', attendee:'Asistente', downloadTicket:'Descargar', addCalendar:'Calendario', copy:'Copiar', copied:'¡Copiado!', scanHint:'Muestra este código QR en la entrada', loadingQr:'Cargando QR...', free:'GRATIS', mswTitle:'Necesitas transporte para el evento?', mswDesc:'Reserva un carro o moto ahora — todo pre-llenado!', mswBtn:'Reservar Transporte', tlTitle:'¿ESTÁS ORGANIZANDO UN EVENTO?', tlDesc:'Crea tu evento en Tikè Lakay, vende boletos en línea y acepta MonCash y NatCash.', tlBtn:'CREAR MI EVENTO', navHome:'Inicio', navEvents:'Eventos', navCreate:'Crear', navTickets:'Boletos', navAccount:'Cuenta' }
 };
 
 var curLang = localStorage.getItem('tl_lang') || 'ht';
@@ -608,8 +625,30 @@ function loadTicketSponsors(eventId) {
       var list = (d && d.sponsors || []).filter(function (s) { return /^data:image\/(png|jpeg|webp);base64,/.test(s.logo || ''); });
       if (!list.length) return;
       var row = document.getElementById('tkSpRow'); row.innerHTML = '';
-      list.forEach(function (s) { var im = document.createElement('img'); im.src = s.logo; im.alt = s.name || ''; row.appendChild(im); });
-      document.getElementById('tkSpLbl').textContent = L[lang] || L.ht;
+      var TIERS = ['main', 'gold', 'silver', 'partner'];
+      var TL = { ht: { main: 'Sponsò Prensipal', gold: 'Sponsò Gold', silver: 'Sponsò Silver', partner: 'Patnè Ofisyèl' },
+                 fr: { main: 'Sponsor principal', gold: 'Sponsors Or', silver: 'Sponsors Argent', partner: 'Partenaires officiels' },
+                 en: { main: 'Main Sponsor', gold: 'Gold Sponsors', silver: 'Silver Sponsors', partner: 'Official Partners' },
+                 es: { main: 'Patrocinador principal', gold: 'Patrocinadores Oro', silver: 'Patrocinadores Plata', partner: 'Socios oficiales' },
+                 pt: { main: 'Patrocinador principal', gold: 'Patrocinadores Ouro', silver: 'Patrocinadores Prata', partner: 'Parceiros oficiais' } }[lang] || null;
+      var tiered = list.some(function (s) { return TIERS.indexOf(s.tier) >= 0; });
+      if (!tiered) {
+        list.forEach(function (s) { var im = document.createElement('img'); im.src = s.logo; im.alt = s.name || ''; row.appendChild(im); });
+        document.getElementById('tkSpLbl').textContent = L[lang] || L.ht;
+      } else {
+        /* one block per level, highest first; a sponsor with no level counts as a partner */
+        document.getElementById('tkSpLbl').style.display = 'none';
+        row.style.display = 'block';
+        TIERS.forEach(function (k) {
+          var g = list.filter(function (s) { return (TIERS.indexOf(s.tier) >= 0 ? s.tier : 'partner') === k; });
+          if (!g.length) return;
+          var box = document.createElement('div'); box.className = 'tier ' + k;
+          box.innerHTML = '<div class="tl"></div><div class="row"></div>';
+          box.querySelector('.tl').textContent = (TL || { main: 'Sponsò Prensipal', gold: 'Sponsò Gold', silver: 'Sponsò Silver', partner: 'Patnè Ofisyèl' })[k];
+          g.forEach(function (s) { var im = document.createElement('img'); im.src = s.logo; im.alt = s.name || ''; box.querySelector('.row').appendChild(im); });
+          row.appendChild(box);
+        });
+      }
       document.getElementById('tkSponsors').classList.add('show');
     }).catch(function () {});
 }
@@ -676,6 +715,8 @@ function renderTicket(data, qrData) {
     document.getElementById('tlUpsell').style.display = '';
     document.getElementById('saveBox').style.display = '';
   }
+  /* a free registration is not a sale */
+  if (!(Number(data.totalAmount) > 0) || data.paymentMethod === 'free') document.getElementById('tkFinal').style.display = 'none';
 
   applyI18n();
 }
@@ -708,7 +749,7 @@ function fmtWhen(iso) {
 function paintQr(q) {
   var img = document.getElementById('qrImg'), wait = document.getElementById('qrWait'), ph = document.getElementById('qrPlaceholder');
   clearInterval(qrTimer);
-  if (q && q.qr) { img.src = q.qr; img.style.display = 'block'; wait.style.display = 'none'; ph.style.display = 'none'; return; }
+  if (q && q.qr) { img.src = q.qr; img.style.display = 'block'; wait.style.display = 'none'; ph.style.display = 'none'; paintPasses(q); return; }
   if (!q || q.status !== 'completed') return;          // pending/failed: the status badge already says so
   ph.style.display = 'none'; img.style.display = 'none'; wait.style.display = '';
   drawDecoy();
@@ -726,6 +767,33 @@ function paintQr(q) {
     document.getElementById('qwC').textContent = t('qrIn').replace('{t}', d >= 1 ? d + 'j ' + (h % 24) + 'h' : (h ? h + 'h ' : '') + m + 'min ' + (h ? '' : sec + 's'));
   };
   tick(); qrTimer = setInterval(tick, 1000);
+}
+/* 4 Nov 2026: a group ticket shows one QR per person (tabs). The QR on screen is the selected person's; it can be sent
+   to that person on its own (share sheet with the picture, or the picture is downloaded). */
+var passSel = 0;
+function paintPasses(q) {
+  var bar = document.getElementById('passBar');
+  if (!q.passes || q.passes.length < 2) { bar.style.display = 'none'; return; }
+  if (passSel >= q.passes.length) passSel = 0;
+  var p = q.passes[passSel];
+  document.getElementById('qrImg').src = p.qr;
+  document.getElementById('passLbl').textContent = t('passN').replace('{n}', p.n).replace('{of}', q.passes.length) + (p.used ? ' · ' + t('passIn') : '');
+  document.getElementById('passNote').textContent = t('passNote');
+  document.getElementById('passTabs').innerHTML = q.passes.map(function (x, i) {
+    return '<button type="button" data-i="' + i + '" style="min-width:42px;min-height:38px;border-radius:10px;font-weight:800;cursor:pointer;border:2px solid ' + (i === passSel ? '#0B2E6F' : '#D6DCE8') +
+      ';background:' + (x.used ? '#E2F4E8' : i === passSel ? '#EEF3FF' : '#fff') + '">' + x.n + (x.used ? ' ✓' : '') + '</button>';
+  }).join('');
+  [].forEach.call(document.querySelectorAll('#passTabs button'), function (b) { b.onclick = function () { passSel = +b.getAttribute('data-i'); paintPasses(q); }; });
+  var sb = document.getElementById('passShare'); sb.textContent = t('passShare');
+  sb.onclick = function () {
+    var name = 'tike-' + (ticketData && ticketData.referenceId || '') + '-' + p.n + '.png';
+    fetch(p.qr).then(function (r) { return r.blob(); }).then(function (blob) {
+      var f = new File([blob], name, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [f] })) return navigator.share({ files: [f], title: (eventData && eventData.title) || 'Tikè Lakay' });
+      var u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+    }).catch(function () {});
+  };
+  bar.style.display = '';
 }
 /* Ask the server for the QR again (at activation, or when the page comes back
    to the front). A few seconds of slack: the server decides, not this phone. */

@@ -79,6 +79,7 @@ section{padding:18px 0;scroll-margin-top:58px}
 .empty a.lnk{color:var(--red);font-weight:800;text-decoration:none}
 .small-link{display:inline-block;margin-top:12px;color:var(--blue);font-weight:800;font-size:.9rem;text-decoration:none}
 .tut-link{display:inline-block;margin-top:14px;color:#fff;font-weight:800;font-size:.95rem;text-decoration:underline;text-underline-offset:3px}
+.share-site{display:inline-flex;align-items:center;gap:6px;margin:12px 0 0 0;background:#25D366;color:#fff;border:0;border-radius:99px;padding:10px 16px;font-weight:800;font-size:.92rem;font-family:inherit;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.18)}
 .help.tut{background:#00209F}
 .help{display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:#25D366;color:#fff;font-weight:800;font-size:.85rem;padding:9px 14px;border-radius:999px;text-decoration:none}
 .loading{color:var(--light);font-size:.9rem;margin-top:16px;display:flex;align-items:center;gap:10px}
@@ -205,7 +206,9 @@ footer small{font-size:.75rem;color:#6F7C99}
     <a class="cta g" href="#evenman">🎟️ ACHTE TIKÈ</a>
     <a class="cta b" href="create-event.html">➕ KREYE EVÈNMAN GRATIS</a>
   </div>
-  <a class="tut-link" href="tutorials/">🎓 Kijan sa mache? Gade videyo yo ›</a>
+  <a class="tut-link" href="tutorials/">🎓 Kijan sa mache? Gade videyo yo ›</a><br>
+  <!-- 5 Nov 2026, Jeffery: "i cant share tike lakay" - the site itself had no share button (only each event) -->
+  <button type="button" class="share-site" onclick="tlShareSite()">📤 Pataje Tikè Lakay</button>
   <div class="chips-line">🎵 Konsè • 🎓 Fòmasyon • 🎉 Fèt • 💼 Konferans • ⛪ Legliz</div>
 </div></div>
 
@@ -326,6 +329,18 @@ footer small{font-size:.75rem;color:#6F7C99}
    print a key name to a visitor. Same saved choice as every Tikè Lakay page
    (localStorage tl_lang: ht · fr · en · es · pt). */
 var LANG = 'ht';
+/* the WHOLE site, not one event: the phone's own share sheet (WhatsApp, Facebook, SMS...) or WhatsApp directly */
+function tlShareSite() {
+  var M = { ht: '🎟️ Tikè Lakay: tout evènman Ayiti nan men ou. Achte tikè, kreye evènman ou gratis.',
+            fr: '🎟️ Tikè Lakay : tous les événements d’Haïti dans votre main. Achetez vos billets, créez votre événement gratuitement.',
+            en: '🎟️ Tikè Lakay: all of Haiti’s events in your hand. Buy tickets, create your event for free.',
+            es: '🎟️ Tikè Lakay: todos los eventos de Haití en tu mano. Compra boletos, crea tu evento gratis.',
+            pt: '🎟️ Tikè Lakay: todos os eventos do Haiti na sua mão. Compre ingressos, crie seu evento grátis.' };
+  var l = 'ht'; try { l = localStorage.getItem('tl_lang') || LANG || 'ht'; } catch (e) {}
+  var text = M[l] || M.ht, url = 'https://tikelakay.com/';
+  if (navigator.share) { navigator.share({ title: 'Tikè Lakay', text: text, url: url }).catch(function () {}); return; }
+  window.open('https://wa.me/?text=' + encodeURIComponent(text + '\n' + url), '_blank');
+}
 try { LANG = localStorage.getItem('tl_lang') || 'ht'; } catch (e) {}
 if (['ht','fr','en','es','pt'].indexOf(LANG) === -1) LANG = 'ht';
 var TR = {
@@ -362,6 +377,7 @@ var TR = {
  '🚀 KREYE EVÈNMAN GRATIS':{fr:'🚀 CRÉER UN ÉVÉNEMENT GRATUIT',en:'🚀 CREATE AN EVENT FREE',es:'🚀 CREAR EVENTO GRATIS',pt:'🚀 CRIAR EVENTO GRÁTIS'},
  '🎓 Kijan sa mache? Gade videyo yo ›':{fr:'🎓 Comment ça marche ? Voir les vidéos ›',en:'🎓 How does it work? Watch the videos ›',es:'🎓 ¿Cómo funciona? Mira los videos ›',pt:'🎓 Como funciona? Veja os vídeos ›'},
  '🎓 Gade videyo tutoryèl yo':{fr:'🎓 Voir les tutoriels vidéo',en:'🎓 Watch the video tutorials',es:'🎓 Ver los tutoriales en video',pt:'🎓 Ver os tutoriais em vídeo'},
+ '📤 Pataje Tikè Lakay':{fr:'📤 Partager Tikè Lakay',en:'📤 Share Tikè Lakay',es:'📤 Compartir Tikè Lakay',pt:'📤 Compartilhar Tikè Lakay'},
  '🎓 Tutoryèl':{fr:'🎓 Tutoriels',en:'🎓 Tutorials',es:'🎓 Tutoriales',pt:'🎓 Tutoriais'},
  '📅 Evènman ki fin pase':{fr:'📅 Événements passés',en:'📅 Past events',es:'📅 Eventos pasados',pt:'📅 Eventos passados'},
  '💬 Bezwen Èd?':{fr:'💬 Besoin d’aide ?',en:'💬 Need help?',es:'💬 ¿Necesitas ayuda?',pt:'💬 Precisa de ajuda?'},

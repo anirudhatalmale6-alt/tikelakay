@@ -4,7 +4,7 @@
  * Pictures, icons, scripts of this site: the saved copy first, refreshed behind.
  * ⛔ Never anything from another site: the API (tickets, payments, the QR) is
  * always asked live - a cached "valid" at the door would be a lie. */
-const CACHE = 'tl-app-v2';
+const CACHE = 'tl-app-v3';
 const SHELL = ['./', 'index.html', 'my-tickets.html', 'check.html', 'manifest.webmanifest',
   'assets/icon-192.png', 'assets/tike-lakay-logo.png', 'event-types.js', 'js/pwa.js'];
 self.addEventListener('install', (e) => {
@@ -20,6 +20,8 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
+  // videos (tutorials) stream straight from the network: a cached copy breaks seeking (Range) and fills the phone
+  if (/\.(mp4|webm|m4a|mp3)$/.test(url.pathname) || req.headers.has('range')) return;
   if (req.mode === 'navigate' || /\.html$/.test(url.pathname) || url.pathname.endsWith('/')) {
     e.respondWith(fetch(req).then((r) => {
       const copy = r.clone(); caches.open(CACHE).then((c) => c.put(req, copy)).catch(() => {});

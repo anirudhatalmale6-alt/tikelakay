@@ -124,7 +124,7 @@ button,input{font-family:var(--body)}
 <div class="topbar">
   <span class="brand">Tikè <em>Lakay</em> — <span data-i18n="doorTitle">Kontwòl Pòt</span></span>
   <div class="langs">
-    <button data-lang="ht">HT</button><button data-lang="fr">FR</button><button data-lang="en">EN</button>
+    <button data-lang="ht">HT</button><button data-lang="fr">FR</button><button data-lang="en">EN</button><button data-lang="es">ES</button><button data-lang="pt">PT</button>
   </div>
 </div>
 
@@ -242,7 +242,55 @@ var I18N = {
         getCode:'Organiser? Get your event\'s door code',
         lUsed:'Used', lUsedBy:'At the door', lScans:'Times scanned',
         notActive:'NOT YET ACTIVE', notActiveSub:'This QR code activates {when} (2 hours before the event). Do not let them in yet.',
-        invalid:'INVALID TICKET', cancelledSub:'This event is cancelled.', needQrSub:'This ticket must be scanned with its QR code (the number alone is not enough).' }
+        invalid:'INVALID TICKET', cancelledSub:'This event is cancelled.', needQrSub:'This ticket must be scanned with its QR code (the number alone is not enough).' },
+  es: { doorTitle:'Control de Entrada', checking:'Verificando...', ok:'VÁLIDO — DÉJELO ENTRAR',
+        notPaid:'NO PAGADO', notFound:'ESTE BOLETO NO EXISTE', failed:'PAGO FALLIDO',
+        refunded:'REEMBOLSADO', error:'NO SE PUEDE VERIFICAR',
+        okSub:'Este boleto está pagado. Deje entrar a la persona.',
+        notPaidSub:'No encontramos el pago. No la deje entrar sin consultar al organizador.',
+        notFoundSub:'Ningún boleto tiene esta referencia. Revise el código.',
+        errorSub:'No pudimos conectar con el servidor. Inténtelo de nuevo en un momento.',
+        noRefSub:'Escanee el código QR del boleto o escriba la referencia abajo.',
+        noRef:'INGRESE UNA REFERENCIA', ticketDetails:'Detalles del boleto',
+        manualLabel:'O escriba la referencia a mano', btnCheck:'Verificar',
+        footNote:'Esta página solo lee el boleto. No cambia nada.',
+        lEvent:'Evento', lDate:'Fecha', lPlace:'Lugar', lName:'Nombre', lType:'Tipo de boleto',
+        lPass:'Persona', lQty:'Cantidad', lRef:'Referencia', lPaid:'Pagado', lAmount:'Total',
+        doorOff:'Modo entrada: apagado', doorOn:'Modo entrada: activado', btnDoorOn:'Activar', btnDoorOff:'Apagar',
+        doorCodeLabel:'Ingrese el código de entrada del evento', btnUnlock:'Desbloquear',
+        badCode:'CÓDIGO INCORRECTO', badCodeSub:'Ese código no es válido. Pida el código de entrada al organizador.',
+        okIn:'VÁLIDO — REGISTRADO', okInSub:'El boleto ya está marcado como usado. Deje entrar a la persona.',
+        usedNow:'ACABA DE ESCANEARLO', usedNowSub:'Lo escaneó hace un momento. Es la misma persona: déjela entrar.',
+        used:'YA USADO', usedSub:'Alguien ya entró con este boleto. No deje entrar a una segunda persona.',
+        footNoteDoor:'El modo entrada está activado: cada boleto escaneado queda marcado como usado.',
+        getCode:'¿Organizador? Obtenga el código de entrada de su evento',
+        lUsed:'Usado', lUsedBy:'En la entrada', lScans:'Veces escaneado',
+        notActive:'AÚN NO ACTIVO', notActiveSub:'Este código QR se activa {when} (2 horas antes del evento). Todavía no la deje entrar.',
+        invalid:'BOLETO NO VÁLIDO', cancelledSub:'Este evento está cancelado.', needQrSub:'Este boleto debe escanearse con su código QR (el número solo no basta).' },
+  pt: { doorTitle:'Controle de Entrada', checking:'Verificando...', ok:'VÁLIDO — PODE ENTRAR',
+        notPaid:'NÃO PAGO', notFound:'ESTE INGRESSO NÃO EXISTE', failed:'PAGAMENTO FALHOU',
+        refunded:'REEMBOLSADO', error:'NÃO FOI POSSÍVEL VERIFICAR',
+        okSub:'Este ingresso está pago. Deixe a pessoa entrar.',
+        notPaidSub:'Não encontramos o pagamento. Não deixe entrar sem falar com o organizador.',
+        notFoundSub:'Nenhum ingresso tem esta referência. Confira o código.',
+        errorSub:'Não conseguimos falar com o servidor. Tente de novo em instantes.',
+        noRefSub:'Escaneie o QR code do ingresso ou digite a referência abaixo.',
+        noRef:'DIGITE UMA REFERÊNCIA', ticketDetails:'Detalhes do ingresso',
+        manualLabel:'Ou digite a referência à mão', btnCheck:'Verificar',
+        footNote:'Esta página só lê o ingresso. Não altera nada.',
+        lEvent:'Evento', lDate:'Data', lPlace:'Local', lName:'Nome', lType:'Tipo de ingresso',
+        lPass:'Pessoa', lQty:'Quantidade', lRef:'Referência', lPaid:'Pago', lAmount:'Total',
+        doorOff:'Modo portaria: desligado', doorOn:'Modo portaria: ligado', btnDoorOn:'Ligar', btnDoorOff:'Desligar',
+        doorCodeLabel:'Digite o código de portaria do evento', btnUnlock:'Desbloquear',
+        badCode:'CÓDIGO ERRADO', badCodeSub:'Esse código não é válido. Peça o código de portaria ao organizador.',
+        okIn:'VÁLIDO — ENTRADA REGISTRADA', okInSub:'O ingresso agora está marcado como usado. Deixe a pessoa entrar.',
+        usedNow:'VOCÊ ACABOU DE ESCANEAR', usedNowSub:'Você escaneou há pouco. É a mesma pessoa: pode entrar.',
+        used:'JÁ USADO', usedSub:'Alguém já entrou com este ingresso. Não deixe uma segunda pessoa entrar.',
+        footNoteDoor:'O modo portaria está ligado: cada ingresso escaneado fica marcado como usado.',
+        getCode:'Organizador? Pegue o código de portaria do seu evento',
+        lUsed:'Usado', lUsedBy:'Na portaria', lScans:'Vezes escaneado',
+        notActive:'AINDA NÃO ATIVO', notActiveSub:'Este QR code ativa {when} (2 horas antes do evento). Ainda não deixe entrar.',
+        invalid:'INGRESSO INVÁLIDO', cancelledSub:'Este evento foi cancelado.', needQrSub:'Este ingresso deve ser escaneado pelo QR code (só o número não basta).' }
 };
 var lang = (localStorage.getItem('tl_lang') || 'ht');
 if (!I18N[lang]) lang = 'ht';
@@ -288,13 +336,13 @@ function formatDate(d) {
   try {
     var dt = new Date(d + 'T00:00:00');
     if (isNaN(dt)) return d;
-    return dt.toLocaleDateString(lang === 'en' ? 'en-GB' : 'fr-FR',
+    return dt.toLocaleDateString(({en:'en-GB',es:'es-ES',pt:'pt-BR'})[lang] || 'fr-FR',
       { day:'numeric', month:'long', year:'numeric' });
   } catch (e) { return d; }
 }
 function formatWhen(iso) {
   if (!iso) return '';
-  try { return new Date(iso).toLocaleString(lang === 'en' ? 'en-GB' : 'fr-FR'); }
+  try { return new Date(iso).toLocaleString(({en:'en-GB',es:'es-ES',pt:'pt-BR'})[lang] || 'fr-FR'); }
   catch (e) { return iso; }
 }
 

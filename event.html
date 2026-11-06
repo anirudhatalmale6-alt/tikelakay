@@ -780,6 +780,11 @@ function loadEventFromAPI(evId) {
          sample prices, on somebody's real event page. */
       try {
         renderPage();
+        /* 6 Nov 2026 (Jeffery: "no buying button"): showLoadingState() hides the
+           "Achte Tikè" button while the event loads - and nothing ever showed it
+           again, so the order bar slid up with only the total in it. */
+        var buyBtn = document.querySelector('.buy-btn');
+        if (buyBtn) buyBtn.style.display = '';
       } catch (e) {
         console.error('renderPage failed on live event data', e);
         showLoadFailure();

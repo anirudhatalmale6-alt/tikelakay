@@ -828,6 +828,7 @@ var translations = {
     reportEvent: 'Rapòte Evènman',
     koutyeTitle: 'Pataje ak touche komisyon!',
     koutyeDesc: 'Ou ka touche 1.5% sou chak tikè vann atravè lyen pa ou.',
+    koutyeDesc30: 'Fòmasyon LajanMaker: Ajan an touche 30% sou pri chak plas ki vann atravè lyen pa l.',
     shareNow: 'Pataje Kounye a',
     similarEvents: 'Evènman Similè',
     navHome: 'Akèy',
@@ -895,6 +896,7 @@ var translations = {
     reportEvent: "Signaler l'Événement",
     koutyeTitle: 'Partagez et gagnez des commissions!',
     koutyeDesc: 'Vous gagnez 1,5 % sur chaque billet vendu via votre lien.',
+    koutyeDesc30: 'Formation LajanMaker : l’Ajan gagne 30 % du prix de chaque place vendue via son lien.',
     shareNow: 'Partager Maintenant',
     similarEvents: 'Événements Similaires',
     navHome: 'Accueil',
@@ -962,6 +964,7 @@ var translations = {
     reportEvent: 'Report Event',
     koutyeTitle: 'Share and earn commissions!',
     koutyeDesc: 'You earn 1.5% on every ticket sold through your link.',
+    koutyeDesc30: 'LajanMaker training: the Ajan earns 30% of the price of every place sold through their link.',
     shareNow: 'Share Now',
     similarEvents: 'Similar Events',
     navHome: 'Home',
@@ -1029,6 +1032,7 @@ var translations = {
     reportEvent: 'Denunciar evento',
     koutyeTitle: 'Compartilhe e ganhe comissões!',
     koutyeDesc: 'Você ganha 1,5% em cada ingresso vendido pelo seu link.',
+    koutyeDesc30: 'Formação LajanMaker: o Ajan ganha 30% do preço de cada vaga vendida pelo seu link.',
     shareNow: 'Compartilhar agora',
     similarEvents: 'Eventos parecidos',
     navHome: 'Início',
@@ -1096,6 +1100,7 @@ var translations = {
     reportEvent: 'Reportar Evento',
     koutyeTitle: 'Comparte y gana comisiones!',
     koutyeDesc: 'Ganas 1,5% en cada boleto vendido por tu enlace.',
+    koutyeDesc30: 'Formación LajanMaker: el Ajan gana 30% del precio de cada plaza vendida por su enlace.',
     shareNow: 'Compartir Ahora',
     similarEvents: 'Eventos Similares',
     navHome: 'Inicio',
@@ -1382,6 +1387,9 @@ function renderPage() {
   /* Koutye Banner */
   if (event.koutyeEnabled) {
     document.getElementById('koutyeBanner').style.display = 'block';
+    /* 6 Nov 2026: a LajanMaker training with the 30% switch on (admin only) - the Ajan earns 30%, not 1.5% */
+    var kd = document.querySelector('#koutyeBanner [data-i18n="koutyeDesc"]');
+    if (kd) kd.textContent = t(event.training30 ? 'koutyeDesc30' : 'koutyeDesc');
   }
 
   /* Similar Events */

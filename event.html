@@ -664,7 +664,7 @@ var API_URL = 'https://haitibiznis-api.onrender.com';
  * day a subdomain of his own domain points at the API, TL_SHARE_BASE becomes
  * that name and every link generated afterwards is branded. Links already
  * shared keep working; the old path still answers. */
-var TL_SHARE_BASE = '';
+var TL_SHARE_BASE = 'https://e.tikelakay.com';   /* 6 Nov 2026: Jeffery added the DNS record; Render verified + HTTPS */
 function shareBase() { return TL_SHARE_BASE || API_URL; }
 
 var event = demoEvent;
@@ -2005,7 +2005,8 @@ function shareKoutye() {
   try { code = localStorage.getItem('tl_my_code') || ''; } catch (e) {}
   var go = function (c) {
     var id = (event && (event._id || event.id)) || new URLSearchParams(window.location.search).get('id');
-    var link = window.location.origin + window.location.pathname + '?id=' + encodeURIComponent(id) + '&ref=' + encodeURIComponent(c);
+    /* 6 Nov 2026: the flyer link (/e/ID) - WhatsApp shows the event's own picture - carrying his code */
+    var link = shareBase() + '/e/' + encodeURIComponent(id) + '?ref=' + encodeURIComponent(c);
     var text = '🎟️ ' + event.title + '\n' + eventWhen() + '\n\n' + link;
     try { localStorage.setItem('tl_my_code', c); } catch (e) {}
     prompt(t('myLink'), link);

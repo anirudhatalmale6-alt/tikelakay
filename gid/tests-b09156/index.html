@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Test results — 30% training + Koli alert</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#00209F;--red:#D21034;--gold:#D4A017;--green:#1B8C3D;--dark:#0A0E1A;--text:#1A2A4A;--muted:#5A6B8A;--border:#E2E8F0;--off:#F5F7FA;
+  --body:'Plus Jakarta Sans',system-ui,sans-serif;--display:'DM Serif Display',Georgia,serif}
+*{box-sizing:border-box}body{margin:0;background:var(--off);color:var(--text);font-family:var(--body)}
+.top{background:var(--dark);color:#fff;padding:16px}
+.top b{font-size:1.02rem}.top p{margin:6px 0 0;font-size:.85rem;opacity:.85;line-height:1.45}
+.wrap{max-width:460px;margin:0 auto;padding:12px 14px 34px}
+h2{font-family:var(--display);font-weight:400;font-size:1.35rem;color:var(--dark);margin:22px 0 4px}
+.tag{display:inline-block;font-weight:800;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;border-radius:99px;padding:5px 10px}
+.live{background:#E8F5E9;color:var(--green)}.wait{background:#FFF1E6;color:#9A4A00}
+.card{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px;margin-top:10px}
+.card h3{margin:0 0 6px;font-size:.98rem;color:var(--dark)}
+.card p{margin:0;font-size:.86rem;line-height:1.5;color:var(--muted)}
+.card img{display:block;width:100%;border-radius:12px;border:1px solid var(--border);margin-top:10px}
+ul.r{list-style:none;margin:8px 0 0;padding:0;font-size:.86rem;line-height:1.45}
+ul.r li{padding:6px 0;border-top:1px solid var(--border)}ul.r li:first-child{border-top:0}
+ul.r li::before{content:"✅ ";}
+.score{font-family:var(--display);font-size:1.6rem;color:var(--green)}
+</style>
+</head>
+<body>
+<div class="top">
+  <b>TEST RESULTS · 6 Nov 2026</b>
+  <p>All tests ran on a private copy of the system with fake buyers and mocked payments. No real money, no real customer, no message sent.</p>
+</div>
+<div class="wrap">
+
+<h2>1. LajanMaker training: 30%</h2>
+<span class="tag live">Installed · switch OFF until you say go</span>
+
+<div class="card">
+  <div class="score">66 / 66 checks passed</div>
+  <ul class="r">
+    <li>1 place at 1,000 HTG through an Ajan link → Ajan credited <b>300 HTG</b>. 2 places → 600 HTG.</li>
+    <li>The buyer still pays 1,000 + 75 fee. The 300 comes from LajanMaker's revenue, not from the 75.</li>
+    <li>Credited only AFTER the payment is confirmed. Reloading the ticket page or re-checking never pays twice.</li>
+    <li>Other organizers' events (tested: a 6,550 HTG party) stay at 1.5% = 98.25 HTG.</li>
+    <li>Only the console code can switch the 30% on: without it, with a wrong code, or with the organizer's own event code → refused. An organizer creating or editing an event cannot turn it on.</li>
+    <li>Only a Fòmasyon event can get 30% (a party is refused).</li>
+    <li>30% needs "Ajan sharing" ON too. Switching back to 1.5% only changes NEW sales; each ticket keeps the rule it was paid under.</li>
+    <li>LajanMaker's payout = revenue minus the 30% (5,000 − 900 = 4,100 in the test).</li>
+    <li>Refund: the ticket stops working at the door, the place goes back on sale, the unpaid commission is cancelled. A commission already paid out is shown "to recover", never hidden.</li>
+    <li>The Ajan's Share button now gives the flyer link with his code (e.tikelakay.com/e/…?ref=CODE): WhatsApp shows the flyer, and a buyer from that link earns him the 30%.</li>
+  </ul>
+</div>
+
+<div class="card">
+  <h3>Console → 🎓 Fòmasyon 30%</h3>
+  <p>One card per training. Two buttons: 30% on/off, Ajan sharing on/off. Who switched it, and when, is recorded.</p>
+  <img src="t1.jpg" alt="Console training tab" loading="lazy">
+</div>
+<div class="card">
+  <h3>What an Ajan sees on the event page</h3>
+  <p>"Ajan an touche 30% sou pri chak plas…" (other events still say 1.5%). Kreyòl, French, English, Spanish, Portuguese.</p>
+  <img src="t2.jpg" alt="Event page banner 30%" loading="lazy">
+</div>
+<div class="card">
+  <h3>Jennifer's list: Ajan, confirmed payment, commission, payout status</h3>
+  <p>"📋 Lavant + komisyon Ajan" under each training: every paid place, the referring Ajan, the amount, and ⏳ Pou peye / ✅ Peye / ↩️ Anile. Totals at the top, and what is left for LajanMaker.</p>
+  <img src="t3.jpg" alt="Training sales list" loading="lazy">
+</div>
+<div class="card">
+  <h3>Refunding a ticket (💸 Ranbousman → 🎟️ Tikè Lakay)</h3>
+  <p>Send the money back first, then type the ticket number and the transfer reference. The Ajan commission is cancelled automatically.</p>
+  <img src="t4.jpg" alt="Ticket refund" loading="lazy">
+</div>
+
+<h2>2. Koli: option A</h2>
+<span class="tag wait">Tested · NOT live · waiting for your OK</span>
+
+<div class="card">
+  <div class="score">23 / 23 checks passed</div>
+  <ul class="r">
+    <li>0–14 minutes: normal search (15 km), nothing changes.</li>
+    <li>At 15 minutes without a driver: the package is offered again to every eligible driver, up to <b>30 km</b>.</li>
+    <li>Limits held: a driver 35.7 km away was NOT offered it, a test/held account was NOT, a driver whose position was 20 minutes old was NOT. Only approved drivers, with a position inside Haiti.</li>
+    <li>Red alert in Jennifer's console on every tab: the package, minutes waited, minutes before the refund, the sender (call / WhatsApp), and the nearest drivers with tap-to-call.</li>
+    <li>A driver accepts → the alert disappears.</li>
+    <li>30 minutes with nobody: cancelled + refund owed, exactly as today (30-minute maximum kept).</li>
+  </ul>
+</div>
+<div class="card">
+  <h3>Jennifer's red alert</h3>
+  <img src="t5.jpg" alt="Koli red alert" loading="lazy">
+</div>
+
+<h2>Old features re-tested</h2>
+<div class="card"><p>Tickets 18/18 · QR passes 21/21 · Academy course 30% 7/7 · Koli backend all pass · Koli pages 30/30 + 34/34 · one-driver-one-job 29/29 + 36/36 · refunds 10/10.</p></div>
+</div>
+</body>
+</html>

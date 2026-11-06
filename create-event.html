@@ -2076,7 +2076,11 @@ function draftHasContent(d) {
             String(f.evOrgName || '').trim());
 }
 
+/* 6 Nov 2026: no draft once the event is published/saved, and never in edit mode (the event itself is the copy). */
+var DRAFT_OFF = false;
+function inEditUrl() { try { return !!new URLSearchParams(location.search).get('edit'); } catch (e) { return false; } }
 function saveDraft() {
+  if (DRAFT_OFF || inEditUrl()) return;
   try {
     var d = collectDraft();
     if (!draftHasContent(d)) return;
@@ -2190,8 +2194,16 @@ function applyDraft(d) {
 
 /* Offered, never forced: coming back to the page is not always "carry on". */
 function offerDraft() {
+  if (inEditUrl()) return;
   var d = readDraft();
   if (!d) return;
+  /* A draft of an event this phone ALREADY published (left by the old 'save when hidden' bug): offering to
+     "continue" it would publish it a second time. Drop it instead. */
+  try {
+    var pub = JSON.parse(localStorage.getItem('tl_events') || '[]').filter(function (e) { return e && e._id; });
+    var f = d.fields || {};
+    if (f.evTitle && pub.some(function (e) { return String(e.title || '').trim() === String(f.evTitle).trim() && (!f.evDate || e.date === f.evDate); })) { clearDraft(); return; }
+  } catch (e) {}
   var t = i18n[curLang] || i18n.ht;
   var bar = document.createElement('div');
   bar.id = 'draftBar';
@@ -2713,7 +2725,7 @@ function publishEvent() {
       return r.json().catch(function () { return { error: 'HTTP ' + r.status }; });
     }).then(function (saved) {
       if (saved && saved._id) {
-        clearDraft();
+        DRAFT_OFF = true; clearDraft();
         alert(t.edit_saved || 'Your changes are saved.');
         location.href = './';
         return;
@@ -2744,8 +2756,8 @@ function publishEvent() {
          returns it exactly once - if it is not caught here it is gone. */
       keepManageCode(saved._id, saved.manageCode);
       showManageCode(saved.manageCode);
-      /* It is published. The half-finished copy has done its job. */
-      clearDraft();
+      /* It is published. The half-finished copy has done its job - and must not come back when the page is left. */
+      DRAFT_OFF = true; clearTimeout(draftTimer); clearDraft();
       showSuccessOverlay(saved._id, shareBase() + '/e/' + saved._id);
       return;
     }

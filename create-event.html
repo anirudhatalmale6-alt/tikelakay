@@ -2404,6 +2404,63 @@ function enterEditMode(ev) {
   if (card) card.insertBefore(banner, card.firstChild);
 }
 
+/* ═══ 24 Nov 2026 (Jeffery: barbers/salons/spas/clinics with a permanent MyPlopPlop shop + "Pran Randevou") ═══
+   ?store=<shop slug>  this page becomes an appointment day of that shop. The shop's booking code (Jennifer makes it
+                       in her merchant console) proves it; without it anybody could sell "appointments" in a real
+                       shop's name. The server checks the code with MyPlopPlop - the page never decides.
+   ?copy=<event id>    "Copy to another day": same times, same prices, new date. Only from the phone holding that
+                       page's manage code; the server carries the shop link over only then. */
+var STORE_LINK = null, COPY_OF = null;
+var SL_T = {
+  ht: { shop: 'Jou randevou pou biznis MyPlopPlop', code: 'Kòd randevou biznis la (8 lèt, Jennifer ba ou li)', need: 'Mete kòd randevou biznis la (8 lèt).', copy: 'Kopi', newdate: 'chwazi NOUVO DAT la (epi chanje jou a nan tit la si li ladan l)', noright: 'Se sèlman telefòn ki te kreye paj sa a ki ka kopye l.' },
+  fr: { shop: 'Jour de rendez-vous pour l’entreprise MyPlopPlop', code: 'Code rendez-vous de l’entreprise (8 lettres, donné par Jennifer)', need: 'Entrez le code rendez-vous de l’entreprise (8 lettres).', copy: 'Copie', newdate: 'choisissez la NOUVELLE DATE (et changez le jour dans le titre s’il y figure)', noright: 'Seul le téléphone qui a créé cette page peut la copier.' },
+  en: { shop: 'Appointment day for the MyPlopPlop business', code: 'Business appointment code (8 letters, from Jennifer)', need: 'Enter the business appointment code (8 letters).', copy: 'Copy', newdate: 'choose the NEW DATE (and change the day in the title if it is there)', noright: 'Only the phone that created this page can copy it.' },
+  es: { shop: 'Día de citas para el negocio MyPlopPlop', code: 'Código de citas del negocio (8 letras, de Jennifer)', need: 'Escribe el código de citas del negocio (8 letras).', copy: 'Copia', newdate: 'elige la NUEVA FECHA (y cambia el día en el título si aparece)', noright: 'Solo el teléfono que creó esta página puede copiarla.' },
+  pt: { shop: 'Dia de horários para o negócio MyPlopPlop', code: 'Código de horários do negócio (8 letras, da Jennifer)', need: 'Digite o código de horários do negócio (8 letras).', copy: 'Cópia', newdate: 'escolha a NOVA DATA (e mude o dia no título se aparecer)', noright: 'Só o telefone que criou esta página pode copiá-la.' }
+};
+function slT(k) { var l = SL_T[curLang] || SL_T.ht; return l[k] || SL_T.ht[k]; }
+function slEsc(v) { return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function slBanner(id, html) {
+  var b = document.createElement('div'); b.id = id; b.innerHTML = html;
+  b.style.cssText = 'background:#EEF6FF;border:1.5px solid #9CC3F5;color:#0B3D91;border-radius:12px;padding:12px 14px;font-size:.88rem;font-weight:700;margin-bottom:12px;line-height:1.45';
+  var card = document.querySelector('#step1 .form-card'); if (card) card.insertBefore(b, card.firstChild);
+  return b;
+}
+(function initStoreAndCopy() {
+  var q; try { q = new URLSearchParams(location.search); } catch (e) { return; }
+  var slug = String(q.get('store') || '').trim().toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 120);
+  if (slug) {
+    STORE_LINK = { slug: slug };
+    choosePath('manual');
+    slBanner('storeLinkBox', '🏪 ' + slEsc(slT('shop')) + ': <b>' + slEsc(slug) + '</b>' +
+      '<label style="display:block;margin:8px 0 4px;font-weight:700">' + slEsc(slT('code')) + '</label>' +
+      '<input id="storeCode" maxlength="12" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="XXXXXXXX" ' +
+      'style="width:100%;padding:11px 12px;border:1.5px solid #9CC3F5;border-radius:10px;font-size:1rem;letter-spacing:3px;text-transform:uppercase">');
+  }
+  var cid = String(q.get('copy') || '');
+  if (/^[a-f0-9]{24}$/i.test(cid)) {
+    var code = manageCodeFor(cid);
+    if (!code) { alert(slT('noright')); return; }
+    COPY_OF = { id: cid, code: code };
+    fetch(API_URL + '/api/events/' + cid).then(function (r) { return r.json(); }).then(function (ev) {
+      if (!ev || !ev._id) return;
+      choosePath('manual');
+      applyAiData({ title: ev.title, type: ev.type, date: '', startTime: ev.startTime, endTime: ev.endTime,
+        location: ev.location, description: ev.description, organizer: ev.organizer, organizerPhone: ev.organizerPhone,
+        tickets: (ev.tickets || []).map(function (t) { return { name: t.name, price: t.price, qty: t.qty }; }) });
+      var badge = document.querySelector('#step1 .form-card > div');
+      if (badge && badge.textContent.indexOf('AI') >= 0) badge.remove();
+      if (ev.typeCustom) setVal('evTypeCustom', ev.typeCustom);
+      if (typeof onTypeChange === 'function') { try { onTypeChange(); } catch (e) {} }
+      (ev.paymentMethods ? Object.keys(ev.paymentMethods) : []).forEach(function (k) {
+        document.querySelectorAll('.pay-check input[type="checkbox"]').forEach(function (cb) { if (cb.value === k) cb.checked = !!ev.paymentMethods[k]; });
+      });
+      setVal('evDate', '');
+      slBanner('copyBanner', '📋 ' + slEsc(slT('copy')) + ': ' + slEsc(ev.title || '') + (ev.storeName ? ' · 🏪 ' + slEsc(ev.storeName) : '') + '<br>➡️ ' + slEsc(slT('newdate')));
+    }).catch(function () {});
+  }
+})();
+
 (function initEditMode() {
   var id = null;
   try { id = new URLSearchParams(location.search).get('edit'); } catch (e) {}
@@ -2739,6 +2796,13 @@ function publishEvent() {
     return;
   }
 
+  if (STORE_LINK) {
+    var sc = String((document.getElementById('storeCode') || {}).value || '').replace(/[^A-Za-z0-9]/g, '').toUpperCase();
+    if (sc.length < 6) { resetPublishBtn(); alert(slT('need')); var si = document.getElementById('storeCode'); if (si) { goStep(1); si.focus(); } return; }
+    eventObj.storeLink = { slug: STORE_LINK.slug, code: sc };
+  } else if (COPY_OF) {
+    eventObj.copyOf = COPY_OF.id; eventObj.copyManageCode = COPY_OF.code;
+  }
   fetch(API_URL + '/api/events', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
